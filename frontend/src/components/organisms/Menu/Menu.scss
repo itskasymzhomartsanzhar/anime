@@ -1,0 +1,133 @@
+.menu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  height: 90px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  // Фон с волной и круглой кнопкой
+  &__background {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  &__wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__container {
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 650px;
+    padding: 0 20px 10px;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 60px;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+
+    .menu__icon {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s ease;
+    }
+
+    .menu__label {
+      font-size: 11.5px;
+      font-weight: 500;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    // Активная кнопка
+    &--active {
+      color: #ff6b35;
+
+      svg path {
+        stroke: #ff6b35;
+      }
+
+      svg circle {
+        stroke: #ff6b35;
+      }
+    }
+
+    // Центральная кнопка (Catalog)
+    &:nth-child(3) {
+      position: relative;
+      margin-top: -32px;
+
+      .menu__icon {
+        background: white;
+        color: black;
+        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        transition: transform 0.3s ease;
+      }
+
+      .menu__label {
+        margin-top: 10px;
+      }
+
+      &:active .menu__icon {
+        transform: scale(0.95);
+      }
+
+      // Активное состояние для Catalog
+      &.menu__item--active .menu__icon {
+        background: #ff6b35;
+
+        svg path {
+          fill: #000000;
+        }
+      }
+    }
+  }
+}
+
+/* Адааптивность */
+@media (max-width: 420px) {
+  .menu__item .menu__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .menu__item:nth-child(3) .menu__icon {
+    width: 52px;
+    height: 52px;
+  }
+}

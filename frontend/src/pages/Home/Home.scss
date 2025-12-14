@@ -1,0 +1,65 @@
+
+.home {
+  min-height: 100vh;
+  background: #000000;
+  color: #fff;
+  padding-bottom: 80px; // 5AB> 4;O <5=N
+
+  &__content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  &__header {
+    padding: 10px 15px 20px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__left-buttons{
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+
+    .left-button {
+      background-color: #272727;
+      color: #FFFFFF;
+      display: flex;
+      gap: 4px;
+      border-radius: 8px;
+      padding: 8px;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+
+      &.active {
+        background-color: #FFFFFF;
+        color: #000000;
+      }
+
+    }
+  }
+
+
+  &__main {
+    padding: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .home {
+    &__episode-badge {
+      width: 70px;
+      height: 70px;
+    }
+
+    &__anime-name {
+      font-size: 20px;
+    }
+
+    &__release-time {
+      font-size: 15px;
+    }
+  }
+}

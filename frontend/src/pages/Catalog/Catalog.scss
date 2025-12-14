@@ -1,0 +1,309 @@
+.catalog {
+  min-height: 100vh;
+  background: #000000;
+  color: white;
+  padding-bottom: 80px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: #000000;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    position: relative;
+  }
+
+  &__back-btn,
+  &__search-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: absolute;
+  }
+
+  &__search-btn {
+    right: 16px;
+  }
+
+  &__title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+  }
+
+  &__tabs {
+    display: flex;
+    padding: 0 16px;
+    justify-content: space-around;
+    margin-bottom: 16px;
+  }
+
+  &__tab {
+    width: 100px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 0;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+
+    &--active {
+      color: white;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #272727;
+      }
+    }
+  }
+
+
+
+  // Top Anime filters
+  &__filters {
+    padding: 0 16px;
+
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__filter-btn {
+    background: #1a1a1a;
+    border: 1px solid transparent;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+
+    &--active {
+      background: white;
+      color: #000000;
+    }
+  }
+
+  // Grid for Top Anime and All Seasons with year
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 16px;
+
+  }
+
+  &__card {
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  &__card-image {
+    width: 100%;
+    height: 240px;
+    background-color: #1a1a1a;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+
+  &__card-info {
+    padding: 0 4px;
+  }
+
+  &__card-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: white;
+  }
+
+  &__card-meta {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+  }
+
+  // All Seasons
+  &__seasons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 16px;
+  }
+
+  &__year-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-bottom: 1px solid #272727;
+    padding-bottom: 20px;
+  }
+
+  &__year-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+  }
+
+  &__season-filters {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  &__season-btn {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  // Year modal header
+  &__year-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 12px 0;
+    background: #171717;
+    position: relative;
+  }
+
+  &__year-nav {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+
+  &__year-current {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    min-width: 80px;
+    text-align: center;
+  }
+
+  &__year-close {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: absolute;
+    right: 0;
+  }
+
+  // All Anime letters
+  &__letters {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px;
+
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  &__letter-btn {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    &--active {
+      background: white;
+      color: #000000;
+      border-color: white;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  // All Anime list
+  &__list {
+    padding: 0 16px;
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:active {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  &__list-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+  }
+}
