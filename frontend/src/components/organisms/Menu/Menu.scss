@@ -77,10 +77,17 @@
 
       svg path {
         stroke: #ff6b35;
+        color: #ff6b35;
       }
 
       svg circle {
         stroke: #ff6b35;
+      }
+
+      // Для иконок с fill (например Schedule)
+      svg path[fill] {
+        fill: #ff6b35;
+        stroke: none;
       }
     }
 

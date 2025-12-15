@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Home from './pages/Home/Home';
 import Search from './pages/Search/Search';
+import Schedule from './pages/Schedule/Schedule';
 import Catalog from './pages/Catalog/Catalog';
 import AnimeDetail from './pages/AnimeDetail/AnimeDetail';
 import Watch from './pages/Watch/Watch';
@@ -44,7 +45,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/schedule" element={<div>Schedule Page</div>} />
+          <Route path="/schedule" element={<Schedule />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/anime/:id" element={<AnimeDetail />} />
           <Route path="/watch/:id/:episodeId" element={<Watch />} />
