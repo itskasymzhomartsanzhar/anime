@@ -72,7 +72,8 @@
   &__content {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    padding: 20px 20px 20px 20px;
+
   }
 
   &__section {
@@ -161,14 +162,31 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 375px) {
   .search-filters {
-    align-items: center;
-    justify-content: center;
+    &__content {
+      padding: 20px 0 20px 20px;
 
-    &__modal {
-      max-width: 500px;
-      border-radius: 24px;
+    }
+    &__section{
+        &:last-child {
+        padding-right: 30px;
+      }
     }
   }
+}
+@media (min-width: 425px) {
+  .search-filters {
+    &__content {
+      flex: 1;
+      padding: 20px 20px 20px 20px;
+
+    }
+    &__section{
+        &:last-child {
+        padding-right: 70px;
+      }
+    }
+  }
+
 }

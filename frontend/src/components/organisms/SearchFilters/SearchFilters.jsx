@@ -5,36 +5,38 @@ const SearchFilters = ({ isOpen, onClose, onApply, initialFilters }) => {
   const [selectedSort, setSelectedSort] = useState(initialFilters?.sort || 'popular');
   const [selectedType, setSelectedType] = useState(initialFilters?.type || 'all');
   const [selectedGenres, setSelectedGenres] = useState(initialFilters?.genres || []);
-  const sortOptions = [
-    { id: 'popular', label: 'Популярные' },
-    { id: 'title', label: 'Название' },
-    { id: 'upload', label: 'Дата загрузки' },
+const sortOptions = [
+  { id: 'title', label: 'Название' },          // 8
+  { id: 'popular', label: 'Популярные' },      // 10
+  { id: 'upload', label: 'Дата загрузки' },    // 13
+  { id: 'recently', label: 'Недавно обновленные' }, // 19
+];
 
-    { id: 'recently', label: 'Недавно обновленные' },
-  ];
+const typeOptions = [
+  { id: 'all', label: 'Все' },      // 3
+  { id: 'tv', label: 'Сериал' },    // 6
+  { id: 'movie', label: 'Фильм' },  // 5
+];
 
-  const typeOptions = [
-    { id: 'all', label: 'Все' },
-    { id: 'movie', label: 'Фильм' },
-    { id: 'tv', label: 'Сериал' },
-  ];
+const genreOptions = [
+    { id: 'vampire', label: 'Вампиры' },              // 8
+  { id: 'horror', label: 'Ужасы' },                 // 5
+  { id: 'historical', label: 'Историческое' },      // 13
+  { id: 'adventure', label: 'Приключения' },        // 12
+  { id: 'military', label: 'Военное' },             // 7
 
-  const genreOptions = [
-    { id: 'action', label: 'Экшен' },
-    { id: 'adventure', label: 'Приключения' },
-    { id: 'magic', label: 'Магия' },
-    { id: 'isekai', label: 'Исекай' },
-    { id: 'demons', label: 'Демоны' },
-    { id: 'fantasy', label: 'Фэнтези' },
-    { id: 'game', label: 'Игры' },
-    { id: 'historical', label: 'Историческое' },
-    { id: 'horror', label: 'Ужасы' },
-    { id: 'vampire', label: 'Вампиры' },
-    { id: 'military', label: 'Военное' },
-    { id: 'psychological', label: 'Психологическое' },
-    { id: 'school', label: 'Школьное' },
-    { id: 'supernatural', label: 'Сверхъестественное' },
-  ];
+  { id: 'magic', label: 'Магия' },                  // 5
+  { id: 'action', label: 'Экшен' },                 // 5
+  { id: 'school', label: 'Школьное' },              // 9
+  { id: 'isekai', label: 'Исекай' },                // 6
+  { id: 'demons', label: 'Демоны' },                // 6
+  { id: 'fantasy', label: 'Фэнтези' },              // 7
+  { id: 'game', label: 'Игры' },                    // 4
+  { id: 'supernatural', label: 'Сверхъестественное' }, // 19
+
+  { id: 'psychological', label: 'Психологическое' },   // 15
+];
+
 
   const handleGenreToggle = (genreId) => {
     setSelectedGenres((prev) =>
