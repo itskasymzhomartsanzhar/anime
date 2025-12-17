@@ -193,9 +193,9 @@
     height: 100%;
     background: #FF6B35;
     position: relative;
-    transition: width 0.1s ease-out;
+    transition: width 0.05s linear;
   }
-
+ 
   &__progress-handle {
     position: absolute;
     right: -8px;

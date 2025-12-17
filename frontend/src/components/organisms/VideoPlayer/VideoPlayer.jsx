@@ -187,21 +187,14 @@ const VideoPlayer = ({ videoUrl }) => {
         player.on('Playing', async () => {
           setIsPlaying(true);
           setIsBuffering(false);
+          setShowCenterButton(true);
 
           // Get duration when video starts playing
           const dur = await player.getDuration();
           console.log('Duration on Playing event:', dur);
           if (dur && dur > 0) {
             setDuration(dur);
-          }ам
-
-          // Hide center button after 2 seconds when playing
-          if (centerButtonTimeoutRef.current) {
-            clearTimeout(centerButtonTimeoutRef.current);
           }
-          centerButtonTimeoutRef.current = setTimeout(() => {
-            setShowCenterButton(false);
-          }, 2000);
         });
 
         player.on('Pause', () => {
@@ -304,18 +297,9 @@ const VideoPlayer = ({ videoUrl }) => {
     if (isPlaying) {
       playerRef.current.pause();
       setIsPlaying(false);
-      setShowCenterButton(true);
     } else {
       playerRef.current.play();
       setIsPlaying(true);
-
-      // Hide center button after 2 seconds
-      if (centerButtonTimeoutRef.current) {
-        clearTimeout(centerButtonTimeoutRef.current);
-      }
-      centerButtonTimeoutRef.current = setTimeout(() => {
-        setShowCenterButton(false);
-      }, 2000);
     }
   };
 
@@ -323,7 +307,8 @@ const VideoPlayer = ({ videoUrl }) => {
     if (!playerRef.current || !duration) return;
 
     const rect = progressBar.getBoundingClientRect();
-    const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const clientX = e.clientX || (e.touches && e.touches[0]?.clientX) || (e.changedTouches && e.changedTouches[0]?.clientX);
+    const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     const time = pos * duration;
 
     playerRef.current.seekTo(time);
@@ -348,23 +333,61 @@ const VideoPlayer = ({ videoUrl }) => {
     handleSeek(e, progressBar);
   };
 
+  const handleProgressTouch = (e) => {
+    // Only handle direct touches on progress bar, not on handle
+    if (e.target.closest('.video-player__progress-handle')) {
+      return;
+    }
+
+    e.preventDefault();
+    const progressBar = e.currentTarget;
+    handleSeek(e, progressBar);
+  };
+
   const handleHandleMouseDown = (e) => {
     e.stopPropagation(); // Prevent triggering progress bar click
+    e.preventDefault(); // Prevent default touch behavior
 
     const progressBar = e.currentTarget.closest('.video-player__progress');
     if (!progressBar) return;
 
-    const handleMouseMove = (moveEvent) => {
-      handleSeek(moveEvent, progressBar);
+    let isDragging = true;
+
+    const handleMove = (moveEvent) => {
+      if (!isDragging) return;
+
+      moveEvent.preventDefault(); // Prevent scrolling while dragging
+
+      if (!playerRef.current || !duration) return;
+
+      const rect = progressBar.getBoundingClientRect();
+      const clientX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0]?.clientX);
+      const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      const time = pos * duration;
+
+      // Update visual state immediately without seeking
+      setCurrentTime(time);
+
+      // Use requestAnimationFrame for smooth updates
+      requestAnimationFrame(() => {
+        if (isDragging && playerRef.current) {
+          playerRef.current.seekTo(time);
+        }
+      });
     };
 
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+    const handleEnd = () => {
+      isDragging = false;
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleMove);
+      document.removeEventListener('touchend', handleEnd);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
   };
 
   const handleVolumeChange = (e) => {
@@ -533,6 +556,8 @@ const VideoPlayer = ({ videoUrl }) => {
     if (
       e.target.closest('.video-player__controls') ||
       e.target.closest('.video-player__center-button') ||
+      e.target.closest('.video-player__center-controls') ||
+      e.target.closest('.video-player__nav-button') ||
       e.target.closest('.video-player__settings')
     ) {
       return;
@@ -598,6 +623,18 @@ const VideoPlayer = ({ videoUrl }) => {
       <div
         className="video-player__click-overlay"
         onClick={handleVideoClick}
+        onTouchEnd={(e) => {
+          // Only handle if not touching a button
+          if (
+            !e.target.closest('.video-player__controls') &&
+            !e.target.closest('.video-player__center-button') &&
+            !e.target.closest('.video-player__center-controls') &&
+            !e.target.closest('.video-player__nav-button') &&
+            !e.target.closest('.video-player__settings')
+          ) {
+            handleVideoClick(e);
+          }
+        }}
       />
 
       {/* Top Left PiP Button
@@ -639,6 +676,13 @@ const VideoPlayer = ({ videoUrl }) => {
               setShowQualityMenu(false);
               setShowSpeedMenu(false);
             }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowSettings(!showSettings);
+              setShowQualityMenu(false);
+              setShowSpeedMenu(false);
+            }}
             title="Настройки"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -658,6 +702,11 @@ const VideoPlayer = ({ videoUrl }) => {
               // TODO: Implement previous episode functionality
               console.log('Previous episode');
             }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Previous episode');
+            }}
             aria-label="Предыдущая серия"
           >
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
@@ -669,6 +718,11 @@ const VideoPlayer = ({ videoUrl }) => {
           <button
             className="video-player__center-button"
             onClick={handlePlayPause}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handlePlayPause();
+            }}
             aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'}
           >
             {!isPlaying ? (
@@ -687,6 +741,11 @@ const VideoPlayer = ({ videoUrl }) => {
             className="video-player__nav-button video-player__nav-button--next"
             onClick={() => {
               // TODO: Implement next episode functionality
+              console.log('Next episode');
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               console.log('Next episode');
             }}
             aria-label="Следующая серия"
@@ -761,7 +820,15 @@ const VideoPlayer = ({ videoUrl }) => {
 
           <div className="video-player__right">
             {/* Fullscreen */}
-            <button className="video-player__btn" onClick={toggleFullscreen}>
+            <button
+              className="video-player__btn"
+              onClick={toggleFullscreen}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleFullscreen();
+              }}
+            >
               {isFullscreen ? (
                 // Exit fullscreen icon
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -781,6 +848,7 @@ const VideoPlayer = ({ videoUrl }) => {
           className="video-player__progress"
           onClick={(e) => handleSeek(e, e.currentTarget)}
           onMouseDown={handleProgressMouseDown}
+          onTouchEnd={handleProgressTouch}
         >
           <div
             className="video-player__progress-bar"
@@ -789,6 +857,7 @@ const VideoPlayer = ({ videoUrl }) => {
             <div
               className="video-player__progress-handle"
               onMouseDown={handleHandleMouseDown}
+              onTouchStart={handleHandleMouseDown}
             ></div>
           </div>
         </div>
@@ -807,11 +876,20 @@ const VideoPlayer = ({ videoUrl }) => {
         <div className="video-player__settings-content">
           <div className="video-player__settings-header">
             <h3>Настройки видео</h3>
-            <button onClick={() => {
-              setShowSettings(false);
-              setShowQualityMenu(false);
-              setShowSpeedMenu(false);
-            }}>
+            <button
+              onClick={() => {
+                setShowSettings(false);
+                setShowQualityMenu(false);
+                setShowSpeedMenu(false);
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowSettings(false);
+                setShowQualityMenu(false);
+                setShowSpeedMenu(false);
+              }}
+            >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="white"/>
               </svg>
@@ -823,6 +901,11 @@ const VideoPlayer = ({ videoUrl }) => {
               <button
                 className="video-player__settings-item"
                 onClick={() => setShowQualityMenu(true)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowQualityMenu(true);
+                }}
               >
                 <span>Качество видео</span>
                 <div className="video-player__settings-value">
@@ -836,6 +919,11 @@ const VideoPlayer = ({ videoUrl }) => {
               <button
                 className="video-player__settings-item"
                 onClick={() => setShowSpeedMenu(true)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowSpeedMenu(true);
+                }}
               >
                 <span>Скорость воспроизведения</span>
                 <div className="video-player__settings-value">
@@ -853,6 +941,11 @@ const VideoPlayer = ({ videoUrl }) => {
               <button
                 className="video-player__back-btn"
                 onClick={() => setShowQualityMenu(false)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowQualityMenu(false);
+                }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M15.41 16.59L10.83 12L15.41 7.41L14 6L8 12L14 18L15.41 16.59Z" fill="white"/>
@@ -863,6 +956,11 @@ const VideoPlayer = ({ videoUrl }) => {
               <button
                 className={`video-player__settings-item ${quality === 'auto' ? 'video-player__settings-item--active' : ''}`}
                 onClick={() => handleQualityChange('auto')}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleQualityChange('auto');
+                }}
               >
                 Авто
                 {quality === 'auto' && (
@@ -880,6 +978,11 @@ const VideoPlayer = ({ videoUrl }) => {
                     key={qId}
                     className={`video-player__settings-item ${quality === qId ? 'video-player__settings-item--active' : ''}`}
                     onClick={() => handleQualityChange(qId)}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleQualityChange(qId);
+                    }}
                   >
                     {qLabel}
                     {quality === qId && (
@@ -898,6 +1001,11 @@ const VideoPlayer = ({ videoUrl }) => {
               <button
                 className="video-player__back-btn"
                 onClick={() => setShowSpeedMenu(false)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowSpeedMenu(false);
+                }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M15.41 16.59L10.83 12L15.41 7.41L14 6L8 12L14 18L15.41 16.59Z" fill="white"/>
@@ -910,6 +1018,11 @@ const VideoPlayer = ({ videoUrl }) => {
                   key={rate}
                   className={`video-player__settings-item ${playbackRate === rate ? 'video-player__settings-item--active' : ''}`}
                   onClick={() => handleSpeedChange(rate)}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSpeedChange(rate);
+                  }}
                 >
                   {rate === 1 ? 'Обычная' : `${rate}x`}
                   {playbackRate === rate && (
