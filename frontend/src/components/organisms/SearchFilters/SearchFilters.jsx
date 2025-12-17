@@ -113,24 +113,98 @@ const genreOptions = [
                 </button>
               ))}
             </div>
-          </div>
+          </div><div className="search-filters__section">
+  <h3 className="search-filters__section-title">Жанры</h3>
 
-          <div className="search-filters__section">
-            <h3 className="search-filters__section-title">Жанры</h3>
-            <div className="search-filters__options">
-              {genreOptions.map((option) => (
-                <button
-                  key={option.id}
-                  className={`search-filters__option ${
-                    selectedGenres.includes(option.id) ? 'search-filters__option--active' : ''
-                  }`}
-                  onClick={() => handleGenreToggle(option.id)}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
+  {/* 1 */}
+  <div className="search-filters__options">
+    <button className={`search-filters__option ${selectedGenres.includes('vampire') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('vampire')}>
+      Вампиры
+    </button>
+
+    <button className={`search-filters__option ${selectedGenres.includes('horror') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('horror')}>
+      Ужасы
+    </button>
+
+    <button className={`search-filters__option ${selectedGenres.includes('historical') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('historical')}>
+      Историческое
+    </button>
+  </div>
+
+  {/* 2 */}
+  <div className="search-filters__options">
+    <button className={`search-filters__option ${selectedGenres.includes('adventure') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('adventure')}>
+      Приключения
+    </button>
+
+    <button className={`search-filters__option ${selectedGenres.includes('military') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('military')}>
+      Военное
+    </button>
+
+    <button className={`search-filters__option ${selectedGenres.includes('magic') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('magic')}>
+      Магия
+    </button>
+  </div>
+
+  {/* 3 */}
+  <div className="search-filters__options">
+    <button className={`search-filters__option ${selectedGenres.includes('action') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('action')}>
+      Экшен
+    </button>
+
+    <button className={`search-filters__option ${selectedGenres.includes('school') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('school')}>
+      Школьное
+    </button>
+
+    <button className={`search-filters__option ${selectedGenres.includes('isekai') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('isekai')}>
+      Исекай
+    </button>
+  </div>
+
+  {/* 4 */}
+  <div className="search-filters__options">
+    <button className={`search-filters__option ${selectedGenres.includes('demons') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('demons')}>
+      Демоны
+    </button>
+
+    <button className={`search-filters__option ${selectedGenres.includes('fantasy') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('fantasy')}>
+      Фэнтези
+    </button>
+
+    <button className={`search-filters__option ${selectedGenres.includes('game') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('game')}>
+      Игры
+    </button>
+  </div>
+
+  {/* 5 */}
+  <div className="search-filters__options">
+    <button className={`search-filters__option ${selectedGenres.includes('supernatural') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('supernatural')}>
+      Сверхъестественное
+    </button>
+  </div>
+
+  {/* 6 */}
+  <div className="search-filters__options">
+    <button className={`search-filters__option ${selectedGenres.includes('psychological') ? 'search-filters__option--active' : ''}`}
+      onClick={() => handleGenreToggle('psychological')}>
+      Психологическое
+    </button>
+  </div>
+</div>
+
         </div>
 
         <div className="search-filters__footer">
