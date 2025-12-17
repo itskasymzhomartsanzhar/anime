@@ -319,20 +319,22 @@ const VideoPlayer = ({ videoUrl }) => {
     }
   };
 
-  const handleSeek = (e) => {
+  const handleSeek = (e, progressBar) => {
     if (!playerRef.current || !duration) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = progressBar.getBoundingClientRect();
     const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const time = pos * duration;
-    
+
     playerRef.current.seekTo(time);
     setCurrentTime(time);
   };
 
   const handleProgressMouseDown = (e) => {
+    const progressBar = e.currentTarget;
+
     const handleMouseMove = (moveEvent) => {
-      handleSeek(moveEvent);
+      handleSeek(moveEvent, progressBar);
     };
 
     const handleMouseUp = () => {
@@ -343,7 +345,26 @@ const VideoPlayer = ({ videoUrl }) => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
 
-    handleSeek(e);
+    handleSeek(e, progressBar);
+  };
+
+  const handleHandleMouseDown = (e) => {
+    e.stopPropagation(); // Prevent triggering progress bar click
+
+    const progressBar = e.currentTarget.closest('.video-player__progress');
+    if (!progressBar) return;
+
+    const handleMouseMove = (moveEvent) => {
+      handleSeek(moveEvent, progressBar);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
   };
 
   const handleVolumeChange = (e) => {
@@ -627,23 +648,54 @@ const VideoPlayer = ({ videoUrl }) => {
         </div>
       )}
 
-      {/* Center Play/Pause Button */}
+      {/* Center Controls */}
       {showCenterButton && (
-        <button
-          className="video-player__center-button"
-          onClick={handlePlayPause}
-          aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'}
-        >
-          {!isPlaying ? (
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
-              <path d="M8 5V19L19 12L8 5Z" fill="white"/>
+        <div className="video-player__center-controls">
+          {/* Previous Episode Button */}
+          <button
+            className="video-player__nav-button video-player__nav-button--prev"
+            onClick={() => {
+              // TODO: Implement previous episode functionality
+              console.log('Previous episode');
+            }}
+            aria-label="Предыдущая серия"
+          >
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M6 6H8V18H6V6ZM9.5 12L18 6V18L9.5 12Z" fill="white"/>
             </svg>
-          ) : (
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
-              <path d="M6 4H10V20H6V4ZM14 4H18V20H14V4Z" fill="white"/>
+          </button>
+
+          {/* Play/Pause Button */}
+          <button
+            className="video-player__center-button"
+            onClick={handlePlayPause}
+            aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'}
+          >
+            {!isPlaying ? (
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+                <path d="M8 5V19L19 12L8 5Z" fill="white"/>
+              </svg>
+            ) : (
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+                <path d="M6 4H10V20H6V4ZM14 4H18V20H14V4Z" fill="white"/>
+              </svg>
+            )}
+          </button>
+
+          {/* Next Episode Button */}
+          <button
+            className="video-player__nav-button video-player__nav-button--next"
+            onClick={() => {
+              // TODO: Implement next episode functionality
+              console.log('Next episode');
+            }}
+            aria-label="Следующая серия"
+          >
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M16 18H18V6H16V18ZM6 18L14.5 12L6 6V18Z" fill="white"/>
             </svg>
-          )}
-        </button>
+          </button>
+        </div>
       )}
 
       {/* Custom Controls */}
@@ -727,14 +779,17 @@ const VideoPlayer = ({ videoUrl }) => {
                 {/* Progress Bar */}
         <div
           className="video-player__progress"
-          onClick={handleSeek}
+          onClick={(e) => handleSeek(e, e.currentTarget)}
           onMouseDown={handleProgressMouseDown}
         >
           <div
             className="video-player__progress-bar"
             style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
           >
-            <div className="video-player__progress-handle"></div>
+            <div
+              className="video-player__progress-handle"
+              onMouseDown={handleHandleMouseDown}
+            ></div>
           </div>
         </div>
 
@@ -764,7 +819,7 @@ const VideoPlayer = ({ videoUrl }) => {
           </div>
 
           {!showQualityMenu && !showSpeedMenu && (
-            <>
+            <div className="video-player__main-menu">
               <button
                 className="video-player__settings-item"
                 onClick={() => setShowQualityMenu(true)}
@@ -779,7 +834,7 @@ const VideoPlayer = ({ videoUrl }) => {
               </button>
 
               <button
-                className="video-player__settings-item modal-setting"
+                className="video-player__settings-item"
                 onClick={() => setShowSpeedMenu(true)}
               >
                 <span>Скорость воспроизведения</span>
@@ -790,11 +845,11 @@ const VideoPlayer = ({ videoUrl }) => {
                   </svg>
                 </div>
               </button>
-            </>
+            </div>
           )}
 
           {showQualityMenu && (
-            <div className="video-player__submenu quality-setting">
+            <div className="video-player__submenu">
               <button
                 className="video-player__back-btn"
                 onClick={() => setShowQualityMenu(false)}
@@ -839,7 +894,7 @@ const VideoPlayer = ({ videoUrl }) => {
           )}
 
           {showSpeedMenu && (
-            <div className="video-player__submenu speed-setting">
+            <div className="video-player__submenu">
               <button
                 className="video-player__back-btn"
                 onClick={() => setShowSpeedMenu(false)}
