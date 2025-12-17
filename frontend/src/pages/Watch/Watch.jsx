@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import EpisodePreview from '@/components/organisms/EpisodePreview/EpisodePreview.jsx';
+import VideoPlayer from '@/components/organisms/VideoPlayer/VideoPlayer.jsx';
 import './Watch.scss';
 import placeholder from '@/assets/placeholder.jpg';
 const Watch = () => {
@@ -596,7 +597,7 @@ const [commentsData, setCommentsData] = useState([
                 </div>
               <p className="comments-modal__comment-text">{comment.text}</p>
               <div className="comments-modal__comment-actions">
-                <button
+                {/*<button
                   className={`comments-modal__action-btn ${likedComments[comment.id] ? 'comments-modal__action-btn--active' : ''}`}
                   onClick={() => handleLike(comment.id)}
                 >
@@ -612,7 +613,7 @@ const [commentsData, setCommentsData] = useState([
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M17 2V13M22 11V4C22 2.89543 21.1046 2 20 2H6.57377C5.09299 2 3.83379 3.08027 3.60863 4.54377L2.53167 11.5438C2.25209 13.3611 3.65819 15 5.49677 15H9C9.55228 15 10 15.4477 10 16V19.5342C10 20.896 11.104 22 12.4658 22C12.7907 22 13.085 21.8087 13.2169 21.5119L16.7361 13.5939C16.8966 13.2327 17.2547 13 17.6499 13H20C21.1046 13 22 12.1046 22 11Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
-                </button>
+                </button>*/}
                 <button className="comments-modal__action-btn" onClick={() => handleReply(comment.id)}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8 12H8.01M12 12H12.01M16 12H16.01M21 12C21 16.4183 16.9706 20 12 20C10.4607 20 9.01172 19.6565 7.74467 19.0511L3 20L4.39499 16.28C3.51156 15.0423 3 13.5743 3 12C3 7.58172 7.02944 4 12 4C16.9706 4 21 7.58172 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -685,14 +686,7 @@ const [commentsData, setCommentsData] = useState([
 
       {/* Video Player */}
       <div className="watch__player-container">
-        <iframe
-         id="kinescope-player"
-          src={episodeData.videoUrl}
-          allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write; screen-wake-lock;"
-          frameBorder="0"
-          allowFullScreen
-          className="watch__player"
-        />
+        <VideoPlayer videoUrl={episodeData.videoUrl} />
       </div>
 
       {/* Episode Info */}
@@ -735,6 +729,7 @@ const [commentsData, setCommentsData] = useState([
         <div className="watch__profile">
           <div className="watch__avatar"></div>
           <span className="watch__anime-name">{episodeData.animeName}</span>
+          {/*
           <div className="watch__rating-btn">
             <button
               className={`watch__rating-btn-like ${episodeLiked ? 'watch__rating-btn-like--active' : ''}`}
@@ -755,6 +750,7 @@ const [commentsData, setCommentsData] = useState([
               </svg>
             </button>
           </div>
+          */}
         </div>
 
 
@@ -770,8 +766,8 @@ const [commentsData, setCommentsData] = useState([
             <span>Комментарии <span className='watch__comments--gray'>{commentsData.length}</span></span>
 
             <svg width="15" height="21" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M8.125 9.75L5 12.875L1.875 9.75" stroke="#6C6C6C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M1.875 6.25L5 3.125L8.125 6.25" stroke="#6C6C6C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8.125 9.75L5 12.875L1.875 9.75" stroke="#6C6C6C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M1.875 6.25L5 3.125L8.125 6.25" stroke="#6C6C6C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 </svg>
 
           </button>
@@ -787,11 +783,7 @@ const [commentsData, setCommentsData] = useState([
         </div>
         <div className="watch__horizontal-hr"></div>
 
-        {/* Episode Tabs */}
-        <div className="watch__tabs">
-          <button className="watch__tab watch__tab--active">Все эпизоды</button>
-          <button className="watch__tab">Похожее</button>
-        </div>
+
       </div>
           <EpisodePreview episodes={mockEpisodes} />
 
@@ -822,12 +814,7 @@ const [commentsData, setCommentsData] = useState([
               >
                 Новые
               </button>
-              <button
-                className={`comments-modal__filter ${activeFilter === 'Super Comments' ? 'comments-modal__filter--active' : ''}`}
-                onClick={() => setActiveFilter('Super Comments')}
-              >
-                Супер комментарии
-              </button>
+
             </div>
 
             <div className="comments-modal__list">
@@ -865,7 +852,7 @@ const [commentsData, setCommentsData] = useState([
                   <button className="comments-modal__send-btn" onClick={handleAddComment}>
                     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_13_106)">
-                    <path d="M9.5 12.6666L12.6667 9.49998M12.6667 9.49998L9.5 6.33331M12.6667 9.49998L6.33333 9.49998M17.4167 9.49998C17.4167 13.8722 13.8723 17.4166 9.5 17.4166C5.12774 17.4166 1.58333 13.8722 1.58333 9.49998C1.58333 5.12773 5.12774 1.58331 9.5 1.58331C13.8723 1.58331 17.4167 5.12773 17.4167 9.49998Z" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9.5 12.6666L12.6667 9.49998M12.6667 9.49998L9.5 6.33331M12.6667 9.49998L6.33333 9.49998M17.4167 9.49998C17.4167 13.8722 13.8723 17.4166 9.5 17.4166C5.12774 17.4166 1.58333 13.8722 1.58333 9.49998C1.58333 5.12773 5.12774 1.58331 9.5 1.58331C13.8723 1.58331 17.4167 5.12773 17.4167 9.49998Z" stroke="#1E1E1E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </g>
                     <defs>
                     <clipPath id="clip0_13_106">

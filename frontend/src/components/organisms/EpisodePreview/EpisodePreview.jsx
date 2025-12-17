@@ -8,6 +8,7 @@ const EpisodePreview = ({ episodes = [] }) => {
   const [selectedEpisode, setSelectedEpisode] = useState(null);
   const [showEpisodeMenu, setShowEpisodeMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [activeTab, setActiveTab] = useState('all'); // 'similar' or 'all'
 
   const handleEpisodeClick = (animeId, episodeId) => {
     navigate(`/watch/${animeId}/${episodeId}`);
@@ -65,6 +66,23 @@ const EpisodePreview = ({ episodes = [] }) => {
 
   return (
     <>
+      {/* Tabs */}
+      <div className="episode-preview__tabs">
+      <button
+          className={`episode-preview__tab ${activeTab === 'all' ? 'episode-preview__tab--active' : ''}`}
+          onClick={() => setActiveTab('all')}
+        >
+          Все эпизоды
+        </button>
+        <button
+          className={`episode-preview__tab ${activeTab === 'similar' ? 'episode-preview__tab--active' : ''}`}
+          onClick={() => setActiveTab('similar')}
+        >
+          Похожие
+        </button>
+
+      </div>
+
       <div className="episode-preview">
         {episodes.map((episode) => (
           <div
@@ -77,11 +95,13 @@ const EpisodePreview = ({ episodes = [] }) => {
             </div>
             <div className="episode-preview__details">
               <div className='episode-preview__info'>
-                <img
-                  src={episode.animeImage || placeholder}
-                  alt="Episode Preview"
-                  className='episode-preview__image'
-                />
+                {activeTab === 'similar' && (
+                  <img
+                    src={episode.animeImage || placeholder}
+                    alt="Episode Preview"
+                    className='episode-preview__image'
+                  />
+                )}
                 <div>
                   <h2 className="episode-preview__title">{episode.title}</h2>
                   <h5 className="episode-preview__description">

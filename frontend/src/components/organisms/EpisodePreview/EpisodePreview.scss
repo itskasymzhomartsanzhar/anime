@@ -9,7 +9,42 @@
     margin-bottom: 100px;
     text-align: center;
 
+    &__tabs {
+        display: flex;
+        gap: 16px;
+        padding: 0 15px;
+        margin-bottom: 8px;
+    }
 
+    &__tab {
+        background: none;
+        border: none;
+        color: #A0A0A0;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 8px 0;
+        position: relative;
+        transition: color 0.3s;
+
+        &:hover {
+            color: #FFFFFF;
+        }
+
+        &--active {
+            color: #FFFFFF;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: rgba(255, 255, 255, 0.5);
+            }
+        }
+    }
 
     &__video{
         width: 100%;

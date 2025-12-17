@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import placeholder from '@/assets/placeholder.jpg';
 import './AnimeDetail.scss';
@@ -8,11 +8,17 @@ const AnimeDetail = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('season1');
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState('New');
+  const [selectedFilter, setSelectedFilter] = useState('Новые');
   const [selectedEpisode, setSelectedEpisode] = useState(null);
   const [showEpisodeMenu, setShowEpisodeMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showRecapMenu, setShowRecapMenu] = useState(false);
+  const [showWatchEpMenu, setShowWatchEpMenu] = useState(true); // По умолчанию активен WATCH EP
+  const [recapFilter, setRecapFilter] = useState('New');
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showStickyTitle, setShowStickyTitle] = useState(false);
+  const titleRef = useRef(null);
 
   // Mock data
   const animeData = {
@@ -31,10 +37,10 @@ const AnimeDetail = () => {
   };
 
   const tabs = [
-    { id: 'all-seasons', label: 'Все сезоны' },
-    { id: 'movies', label: 'Фильмы' },
     { id: 'season1', label: 'Сезон 1' },
     { id: 'season2', label: 'Сезон 2' },
+    { id: 'all-seasons', label: 'Все сезоны' },
+    { id: 'movies', label: 'Фильмы' },
   ];
 
   const allSeasons = [
@@ -50,7 +56,7 @@ const AnimeDetail = () => {
     { id: 3, number: 3, title: 'Название', duration: '24m left', isViewed: false },
   ];
 
-  const filters = ['Новые', 'Старые', 'Похожие', 'Супер лайки'];
+  const filters = ['Новые', 'Старые', 'Похожие'];
 
   const handleBack = () => {
     navigate(-1);
@@ -92,15 +98,45 @@ const AnimeDetail = () => {
     setActiveTab(seasonId);
   };
 
+  // Отслеживание видимости заголовка
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Если заголовок НЕ видим, показываем sticky title
+        setShowStickyTitle(!entry.isIntersecting);
+      },
+      {
+        threshold: 0,
+        rootMargin: '-80px 0px 0px 0px', // Учитываем высоту хедера
+      }
+    );
+
+    if (titleRef.current) {
+      observer.observe(titleRef.current);
+    }
+
+    return () => {
+      if (titleRef.current) {
+        observer.unobserve(titleRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="anime-detail">
       {/* Header */}
-      <div className="anime-detail__header">
+      <div className={`anime-detail__header ${showStickyTitle ? 'anime-detail__header--with-shadow' : ''}`}>
         <button className="anime-detail__back-btn" onClick={handleBack}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
+
+        {/* Sticky Title - появляется при скролле */}
+        <h2 className={`anime-detail__sticky-title ${showStickyTitle ? 'anime-detail__sticky-title--visible' : ''}`}>
+          {animeData.title.replace('\n', ' ')}
+        </h2>
+
         <button className="anime-detail__search-btn" onClick={handleSearch}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -111,7 +147,7 @@ const AnimeDetail = () => {
       {/* Poster */}
       <div className="anime-detail__poster" style={{ backgroundImage: `url(${animeData.poster})` }}>
         <div className="anime-detail__poster-overlay">
-          <h1 className="anime-detail__title">{animeData.title}</h1>
+          <h1 ref={titleRef} className="anime-detail__title">{animeData.title}</h1>
         </div>
       </div>
 
@@ -142,20 +178,95 @@ const AnimeDetail = () => {
         >
           Показать больше
         </button>
+
+        {/* Watch Buttons */}
+        <div className="anime-detail__watch-buttons anime-detail__watch-buttons--inline">
+          <button
+            className={`anime-detail__watch-btn anime-detail__watch-btn--recap ${showRecapMenu ? 'anime-detail__watch-btn--active' : ''}`}
+            onClick={() => {
+              if (!showRecapMenu) {
+                setShowRecapMenu(true);
+                setShowWatchEpMenu(false);
+              }
+            }}
+          >
+            WATCH RECAP
+          </button>
+
+          <button
+            className={`anime-detail__watch-btn anime-detail__watch-btn--ep ${showWatchEpMenu ? 'anime-detail__watch-btn--active' : ''}`}
+            onClick={() => {
+              if (!showWatchEpMenu) {
+                setShowWatchEpMenu(true);
+                setShowRecapMenu(false);
+              }
+            }}
+          >
+            WATCH EP
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Recap Content */}
+        {showRecapMenu && (
+          <div className="anime-detail__inline-content">
+            <div className="anime-detail__inline-filters">
+              <button
+                className={`anime-detail__inline-filter-btn ${recapFilter === 'New' ? 'anime-detail__inline-filter-btn--active' : ''}`}
+                onClick={() => setRecapFilter('New')}
+              >
+                Новые
+              </button>
+              <button
+                className={`anime-detail__inline-filter-btn ${recapFilter === 'Old' ? 'anime-detail__inline-filter-btn--active' : ''}`}
+                onClick={() => setRecapFilter('Old')}
+              >
+                Старые
+              </button>
+            </div>
+          </div>
+        )}
+        {/* Watch EP Content */}
+        {showWatchEpMenu && (
+          <div className="anime-detail__inline-content">
+            <div className="anime-detail__tabs">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`anime-detail__tab ${activeTab === tab.id ? 'anime-detail__tab--active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Season Info */}
+            <div className="anime-detail__season-info">
+              <h3 className="anime-detail__season-title">С1- Название сезона</h3>
+              <p className="anime-detail__episode-count">Эпизод 21</p>
+            </div>
+
+            {/* Filters */}
+            <div className="anime-detail__filters">
+              {filters.map((filter) => (
+                <button
+                  key={filter}
+                  className={`anime-detail__filter-btn ${selectedFilter === filter ? 'anime-detail__filter-btn--active' : ''}`}
+                  onClick={() => setSelectedFilter(filter)}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
-      <div className="anime-detail__tabs">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`anime-detail__tab ${activeTab === tab.id ? 'anime-detail__tab--active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+
 
       {/* Content based on active tab */}
       {activeTab === 'all-seasons' ? (
@@ -184,24 +295,7 @@ const AnimeDetail = () => {
       ) : (
         // Episode List for specific season
         <>
-          {/* Season Info */}
-          <div className="anime-detail__season-info">
-            <h3 className="anime-detail__season-title">С1- Название сезона</h3>
-            <p className="anime-detail__episode-count">Эпизод 21</p>
-          </div>
 
-          {/* Filters */}
-          <div className="anime-detail__filters">
-            {filters.map((filter) => (
-              <button
-                key={filter}
-                className={`anime-detail__filter-btn ${selectedFilter === filter ? 'anime-detail__filter-btn--active' : ''}`}
-                onClick={() => setSelectedFilter(filter)}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
 
           {/* Episodes List */}
           <div className="anime-detail__episodes">
@@ -234,13 +328,28 @@ const AnimeDetail = () => {
         </>
       )}
 
-      {/* Start Watching Button */}
-      <button className="anime-detail__watch-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5 3L19 12L5 21V3Z" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        НАЧАТЬ ПРОСМОТР С1 Э1
-      </button>
+      {/* Fixed Watch Button Container */}
+      <div className="anime-detail__fixed-buttons">
+        <button
+          className="anime-detail__fixed-watch-btn"
+          onClick={() => navigate(`/watch/${id}/1`)}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="black" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 5V19L19 12L8 5Z" fill="white" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          НАЧАТЬ ПРОСМОТР С1 Э1
+        </button>
+
+        <button
+          className={`anime-detail__bookmark-btn ${isBookmarked ? 'anime-detail__bookmark-btn--active' : ''}`}
+          onClick={() => setIsBookmarked(!isBookmarked)}
+          title={isBookmarked ? 'Удалить из закладок' : 'Добавить в закладки'}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z" fill={isBookmarked ? 'white' : 'none'} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
 
       {/* Episode Menu Popup */}
       {showEpisodeMenu && (

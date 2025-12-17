@@ -248,9 +248,13 @@
     display: flex;
     gap: 8px;
     padding: 0 16px;
-
-    flex-wrap: wrap;
     margin-bottom: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   &__letter-btn {
@@ -267,6 +271,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
+    flex-shrink: 0;
 
     &--active {
       background: white;

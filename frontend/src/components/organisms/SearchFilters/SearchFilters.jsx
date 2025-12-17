@@ -8,8 +8,9 @@ const SearchFilters = ({ isOpen, onClose, onApply, initialFilters }) => {
   const sortOptions = [
     { id: 'popular', label: 'Популярные' },
     { id: 'title', label: 'Название' },
-    { id: 'recently', label: 'Недавно обновленные' },
     { id: 'upload', label: 'Дата загрузки' },
+
+    { id: 'recently', label: 'Недавно обновленные' },
   ];
 
   const typeOptions = [
