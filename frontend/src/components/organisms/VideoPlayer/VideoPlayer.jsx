@@ -81,6 +81,7 @@ const VideoPlayer = ({ videoUrl }) => {
         url: `https://kinescope.io/embed/${videoId}`,
         size: { width: '100%', height: '100%' },
         behaviour: {
+          localStorage: false,
           autoPlay: false,
           loop: false,
           muted: false,
