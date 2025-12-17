@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import EpisodePreview from '@/components/organisms/EpisodePreview/EpisodePreview.jsx';
 import VideoPlayer from '@/components/organisms/VideoPlayer/VideoPlayer.jsx';
@@ -22,6 +22,29 @@ const Watch = () => {
     likes: 652,
     dislikes: 0,
   });
+
+  // Video player track controls
+  const [openAudioMenuFunc, setOpenAudioMenuFunc] = useState(null);
+  const [openSubtitleMenuFunc, setOpenSubtitleMenuFunc] = useState(null);
+  const [trackInfo, setTrackInfo] = useState({
+    audioTracks: [],
+    currentAudioTrack: 0,
+    subtitleTracks: [],
+    currentSubtitleTrack: -1
+  });
+
+  // Callbacks for opening menus
+  const handleOpenAudioMenu = useCallback((func) => {
+    setOpenAudioMenuFunc(() => func);
+  }, []);
+
+  const handleOpenSubtitleMenu = useCallback((func) => {
+    setOpenSubtitleMenuFunc(() => func);
+  }, []);
+
+  const handleTracksUpdate = useCallback((info) => {
+    setTrackInfo(info);
+  }, []);
 const [commentsData, setCommentsData] = useState([
   {
     id: 1,
@@ -686,7 +709,12 @@ const [commentsData, setCommentsData] = useState([
 
       {/* Video Player */}
       <div className="watch__player-container">
-        <VideoPlayer videoUrl={episodeData.videoUrl} />
+        <VideoPlayer
+          videoUrl={episodeData.videoUrl}
+          onOpenAudioMenu={handleOpenAudioMenu}
+          onOpenSubtitleMenu={handleOpenSubtitleMenu}
+          onTracksUpdate={handleTracksUpdate}
+        />
       </div>
 
       {/* Episode Info */}
@@ -729,6 +757,34 @@ const [commentsData, setCommentsData] = useState([
         <div className="watch__profile">
           <div className="watch__avatar"></div>
           <span className="watch__anime-name">{episodeData.animeName}</span>
+        </div>
+
+        {/* Audio and Subtitle Track Buttons */}
+        <div className="watch__track-buttons">
+          <button
+            className="watch__track-button watch__track-button--audio"
+          >
+            <svg width="13" height="16" viewBox="0 0 13 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.13885 3.2505C9.13885 1.77738 7.74663 0.583496 6.02774 0.583496C4.30885 0.583496 2.91663 1.77738 2.91663 3.2505V7.24983C2.91663 8.72294 4.30885 9.91683 6.02774 9.91683C7.74663 9.91683 9.13885 8.72294 9.13885 7.24983V3.2505Z" stroke="currentColor" stroke-width="1.16667" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M0.583313 6.80615C0.583313 7.52113 0.724138 8.2291 0.997746 8.88965C1.27136 9.5502 1.67239 10.1504 2.17795 10.656C2.68352 11.1615 3.28371 11.5626 3.94426 11.8362C4.60481 12.1098 5.31278 12.2506 6.02776 12.2506M6.02776 12.2506C6.74273 12.2506 7.45071 12.1098 8.11126 11.8362C8.77181 11.5626 9.372 11.1615 9.87756 10.656C10.3831 10.1504 10.7842 9.5502 11.0578 8.88965C11.3314 8.2291 11.4722 7.52113 11.4722 6.80615M6.02776 12.2506V14.5839M2.91665 14.5839H9.13887" stroke="currentColor" stroke-width="1.16667" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+            <span>{trackInfo.audioTracks[trackInfo.currentAudioTrack]?.label || 'Аудиодорожка'}</span>
+          </button>
+          <button
+            className="watch__track-button watch__track-button--subtitle"
+          >
+<svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M0 1.2C0 0.537259 0.537258 0 1.2 0H13.2C13.8627 0 14.4 0.537258 14.4 1.2V10.8C14.4 11.4627 13.8627 12 13.2 12H1.2C0.537258 12 0 11.4627 0 10.8V1.2ZM1.2 0.8C0.979086 0.8 0.8 0.979086 0.8 1.2V10.8C0.8 11.0209 0.979086 11.2 1.2 11.2H13.2C13.4209 11.2 13.6 11.0209 13.6 10.8V1.2C13.6 0.979086 13.4209 0.8 13.2 0.8H1.2Z" fill="currentColor"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M2.20001 4.4001C2.20001 3.95827 2.55818 3.6001 3.00001 3.6001H5.60001C6.04184 3.6001 6.40001 3.95827 6.40001 4.4001V5.4001H4.80001V5.2001H3.80001V6.8001H4.80001V6.4001H6.40001V7.6001C6.40001 8.04193 6.04184 8.4001 5.60001 8.4001H3.00001C2.55818 8.4001 2.20001 8.04193 2.20001 7.6001V4.4001Z" fill="currentColor"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8 4.4001C8 3.95827 8.35817 3.6001 8.8 3.6001H11.4C11.8418 3.6001 12.2 3.95827 12.2 4.4001V5.4001H10.6V5.2001H9.6V6.8001H10.6V6.4001H12.2V7.6001C12.2 8.04193 11.8418 8.4001 11.4 8.4001H8.8C8.35817 8.4001 8 8.04193 8 7.6001V4.4001Z" fill="currentColor"/>
+</svg>
+
+            <span>{trackInfo.currentSubtitleTrack === -1 ? 'Субтитры' : (trackInfo.subtitleTracks[trackInfo.currentSubtitleTrack]?.label || 'Subtitles')}</span>
+          </button>
+        </div>
+
+        <div className="watch__profile" style={{ display: 'none' }}>
           {/*
           <div className="watch__rating-btn">
             <button

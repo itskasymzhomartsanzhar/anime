@@ -136,6 +136,71 @@
     font-weight: 500;
   }
 
+  &__track-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    padding: 0 16px 16px;
+  }
+
+  &__track-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    svg {
+      flex-shrink: 0;
+      fill: #000;
+      
+    }
+
+    span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &--audio {
+      &:hover {
+        background: #fff;
+        border-color:#fff;
+        color: #000;
+        svg {
+          fill: #fff;
+          path{
+            stroke: #000;
+          }
+        }
+      }
+    }
+
+    &--subtitle {
+      &:hover {
+        background: #fff;
+        border-color:#fff;
+        color: #000;
+        svg {
+          color: #000;
+        }
+      }
+    }
+  }
+
   &__rating-btn {
     display: flex;
     align-items: center;

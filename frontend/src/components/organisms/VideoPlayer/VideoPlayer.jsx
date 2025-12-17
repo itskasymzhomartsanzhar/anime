@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './VideoPlayer.scss';
 
-const VideoPlayer = ({ videoUrl }) => {
+const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
   const navigate = useNavigate();
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
@@ -14,17 +14,22 @@ const VideoPlayer = ({ videoUrl }) => {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [quality, setQuality] = useState('auto');
   const [qualities, setQualities] = useState([]);
+  const [audioTracks, setAudioTracks] = useState([]);
+  const [currentAudioTrack, setCurrentAudioTrack] = useState(0);
+  const [subtitleTracks, setSubtitleTracks] = useState([]);
+  const [currentSubtitleTrack, setCurrentSubtitleTrack] = useState(-1); // -1 means off
   const [showControls, setShowControls] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showQualityMenu, setShowQualityMenu] = useState(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [showAudioMenu, setShowAudioMenu] = useState(false);
+  const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
   const [showCenterButton, setShowCenterButton] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const controlsTimeoutRef = useRef(null);
   const centerButtonTimeoutRef = useRef(null);
-  const mouseMoveTimeoutRef = useRef(null);
   const playbackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
   // Extract video ID from URL
@@ -34,6 +39,31 @@ const VideoPlayer = ({ videoUrl }) => {
   };
 
   const videoId = getVideoId(videoUrl);
+
+  // Expose control functions to parent via callbacks
+  useEffect(() => {
+    if (onOpenAudioMenu) {
+      onOpenAudioMenu(() => {
+        setShowSettings(true);
+        setShowAudioMenu(true);
+        setShowQualityMenu(false);
+        setShowSpeedMenu(false);
+        setShowSubtitleMenu(false);
+      });
+    }
+  }, [onOpenAudioMenu]);
+
+  useEffect(() => {
+    if (onOpenSubtitleMenu) {
+      onOpenSubtitleMenu(() => {
+        setShowSettings(true);
+        setShowSubtitleMenu(true);
+        setShowQualityMenu(false);
+        setShowSpeedMenu(false);
+        setShowAudioMenu(false);
+      });
+    }
+  }, [onOpenSubtitleMenu]);
 
   useEffect(() => {
     // Listen for native fullscreen changes
@@ -165,6 +195,38 @@ const VideoPlayer = ({ videoUrl }) => {
               setQuality('auto');
             }
 
+            // Get audio tracks
+            try {
+              const audioTrackList = await player.getAudioTracks();
+              console.log('Available audio tracks:', audioTrackList);
+              if (Array.isArray(audioTrackList) && audioTrackList.length > 0) {
+                setAudioTracks(audioTrackList);
+                const currentAudio = await player.getCurrentAudioTrack();
+                console.log('Current audio track:', currentAudio);
+                if (typeof currentAudio === 'number') {
+                  setCurrentAudioTrack(currentAudio);
+                }
+              }
+            } catch (error) {
+              console.log('Audio tracks not available:', error);
+            }
+
+            // Get subtitle tracks
+            try {
+              const subtitleTrackList = await player.getTextTracks();
+              console.log('Available subtitle tracks:', subtitleTrackList);
+              if (Array.isArray(subtitleTrackList) && subtitleTrackList.length > 0) {
+                setSubtitleTracks(subtitleTrackList);
+                const currentSubtitle = await player.getCurrentTextTrack();
+                console.log('Current subtitle track:', currentSubtitle);
+                if (typeof currentSubtitle === 'number') {
+                  setCurrentSubtitleTrack(currentSubtitle);
+                }
+              }
+            } catch (error) {
+              console.log('Subtitle tracks not available:', error);
+            }
+
             console.log('=== Video data loaded ===');
           } catch (error) {
             console.error('Error loading video data:', error);
@@ -174,20 +236,19 @@ const VideoPlayer = ({ videoUrl }) => {
         // Try to load qualities immediately
         loadQualities();
 
-        // Also try when video starts playing (in case qualities weren't available initially)
+        // Event listeners
         let qualitiesLoaded = false;
         player.on('Playing', async () => {
+          // Load qualities on first play
           if (!qualitiesLoaded) {
             await loadQualities();
             qualitiesLoaded = true;
           }
-        });
 
-        // Event listeners
-        player.on('Playing', async () => {
           setIsPlaying(true);
           setIsBuffering(false);
           setShowCenterButton(true);
+          setShowControls(true);
 
           // Get duration when video starts playing
           const dur = await player.getDuration();
@@ -195,16 +256,47 @@ const VideoPlayer = ({ videoUrl }) => {
           if (dur && dur > 0) {
             setDuration(dur);
           }
+
+          // Auto-hide controls after 3 seconds when video starts playing
+          if (controlsTimeoutRef.current) {
+            clearTimeout(controlsTimeoutRef.current);
+          }
+          if (centerButtonTimeoutRef.current) {
+            clearTimeout(centerButtonTimeoutRef.current);
+          }
+
+          controlsTimeoutRef.current = setTimeout(() => {
+            setShowControls(false);
+            setShowCenterButton(false);
+          }, 3000);
         });
 
         player.on('Pause', () => {
           setIsPlaying(false);
           setShowCenterButton(true);
+          setShowControls(true);
+
+          // Clear auto-hide timers when paused
+          if (controlsTimeoutRef.current) {
+            clearTimeout(controlsTimeoutRef.current);
+          }
+          if (centerButtonTimeoutRef.current) {
+            clearTimeout(centerButtonTimeoutRef.current);
+          }
         });
 
         player.on('Ended', () => {
           setIsPlaying(false);
           setShowCenterButton(true);
+          setShowControls(true);
+
+          // Clear auto-hide timers when ended
+          if (controlsTimeoutRef.current) {
+            clearTimeout(controlsTimeoutRef.current);
+          }
+          if (centerButtonTimeoutRef.current) {
+            clearTimeout(centerButtonTimeoutRef.current);
+          }
         });
 
         let durationFetched = false;
@@ -284,9 +376,6 @@ const VideoPlayer = ({ videoUrl }) => {
       }
       if (controlsTimeoutRef.current) {
         clearTimeout(controlsTimeoutRef.current);
-      }
-      if (mouseMoveTimeoutRef.current) {
-        clearTimeout(mouseMoveTimeoutRef.current);
       }
     };
   }, [videoId]);
@@ -431,6 +520,39 @@ const VideoPlayer = ({ videoUrl }) => {
     setShowSettings(false);
   };
 
+  const handleAudioTrackChange = async (trackIndex) => {
+    if (!playerRef.current) return;
+
+    try {
+      // Kinescope API для смены аудиодорожки
+      await playerRef.current.setAudioTrack(trackIndex);
+      setCurrentAudioTrack(trackIndex);
+      setShowAudioMenu(false);
+      setShowSettings(false);
+    } catch (error) {
+      console.error('Error changing audio track:', error);
+    }
+  };
+
+  const handleSubtitleTrackChange = async (trackIndex) => {
+    if (!playerRef.current) return;
+
+    try {
+      if (trackIndex === -1) {
+        // Отключить субтитры
+        await playerRef.current.disableTextTrack();
+      } else {
+        // Включить выбранную дорожку субтитров
+        await playerRef.current.enableTextTrack(trackIndex);
+      }
+      setCurrentSubtitleTrack(trackIndex);
+      setShowSubtitleMenu(false);
+      setShowSettings(false);
+    } catch (error) {
+      console.error('Error changing subtitle track:', error);
+    }
+  };
+
   const toggleFullscreen = async () => {
     try {
       const playerContainer = document.querySelector('.video-player');
@@ -524,17 +646,12 @@ const VideoPlayer = ({ videoUrl }) => {
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleMouseMove = () => {
-    // Clear previous movement timeout
-    if (mouseMoveTimeoutRef.current) {
-      clearTimeout(mouseMoveTimeoutRef.current);
-    }
-
-    // Show controls immediately on movement
+  const handleUserActivity = () => {
+    // Show controls immediately on movement/touch
     setShowControls(true);
     setShowCenterButton(true);
 
-    // Clear hide timeouts
+    // Clear any existing hide timeouts
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
     }
@@ -542,13 +659,13 @@ const VideoPlayer = ({ videoUrl }) => {
       clearTimeout(centerButtonTimeoutRef.current);
     }
 
-    // Hide controls after 3 seconds of no movement
-    mouseMoveTimeoutRef.current = setTimeout(() => {
-      if (isPlaying) {
+    // Hide controls after 3 seconds of no activity (only if playing)
+    if (isPlaying) {
+      controlsTimeoutRef.current = setTimeout(() => {
         setShowControls(false);
         setShowCenterButton(false);
-      }
-    }, 3000);
+      }, 3000);
+    }
   };
 
   const handleVideoClick = (e) => {
@@ -608,7 +725,7 @@ const VideoPlayer = ({ videoUrl }) => {
   return (
     <div
       className="video-player"
-      onMouseMove={handleMouseMove}
+      onMouseMove={handleUserActivity}
       onMouseLeave={() => {
         if (isPlaying) {
           setShowControls(false);
@@ -632,6 +749,7 @@ const VideoPlayer = ({ videoUrl }) => {
             !e.target.closest('.video-player__nav-button') &&
             !e.target.closest('.video-player__settings')
           ) {
+            e.preventDefault(); // Prevent onClick from firing after touchend
             handleVideoClick(e);
           }
         }}
@@ -694,7 +812,7 @@ const VideoPlayer = ({ videoUrl }) => {
 
       {/* Center Controls */}
       {showCenterButton && (
-        <div className="video-player__center-controls">
+        <div className="video-player__center-controls" onTouchStart={handleUserActivity}>
           {/* Previous Episode Button */}
           <button
             className="video-player__nav-button video-player__nav-button--prev"
@@ -758,7 +876,16 @@ const VideoPlayer = ({ videoUrl }) => {
       )}
 
       {/* Custom Controls */}
-      <div className={`video-player__controls ${showControls ? 'video-player__controls--visible' : ''}`}>
+      <div
+        className={`video-player__controls ${showControls ? 'video-player__controls--visible' : ''}`}
+        onTouchStart={(e) => {
+          // Don't trigger on progress bar touches as it has its own handlers
+          if (e.target.closest('.video-player__progress')) {
+            return;
+          }
+          handleUserActivity();
+        }}
+      >
 
        
         <div className="video-player__bottom">
@@ -896,7 +1023,7 @@ const VideoPlayer = ({ videoUrl }) => {
             </button>
           </div>
 
-          {!showQualityMenu && !showSpeedMenu && (
+          {!showQualityMenu && !showSpeedMenu && !showAudioMenu && !showSubtitleMenu && (
             <div className="video-player__main-menu">
               <button
                 className="video-player__settings-item"
@@ -933,6 +1060,8 @@ const VideoPlayer = ({ videoUrl }) => {
                   </svg>
                 </div>
               </button>
+
+
             </div>
           )}
 
@@ -1026,6 +1155,107 @@ const VideoPlayer = ({ videoUrl }) => {
                 >
                   {rate === 1 ? 'Обычная' : `${rate}x`}
                   {playbackRate === rate && (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {showAudioMenu && (
+            <div className="video-player__submenu">
+              <button
+                className="video-player__back-btn"
+                onClick={() => setShowAudioMenu(false)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowAudioMenu(false);
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M15.41 16.59L10.83 12L15.41 7.41L14 6L8 12L14 18L15.41 16.59Z" fill="white"/>
+                </svg>
+                Аудиодорожка
+              </button>
+
+              {audioTracks.length > 0 ? (
+                audioTracks.map((track, index) => (
+                  <button
+                    key={index}
+                    className={`video-player__settings-item ${currentAudioTrack === index ? 'video-player__settings-item--active' : ''}`}
+                    onClick={() => handleAudioTrackChange(index)}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleAudioTrackChange(index);
+                    }}
+                  >
+                    {track.label || `Дорожка ${index + 1}`}
+                    {currentAudioTrack === index && (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
+                      </svg>
+                    )}
+                  </button>
+                ))
+              ) : (
+                <div className="video-player__settings-item" style={{ opacity: 0.5, cursor: 'default' }}>
+                  Нет доступных дорожек
+                </div>
+              )}
+            </div>
+          )}
+
+          {showSubtitleMenu && (
+            <div className="video-player__submenu">
+              <button
+                className="video-player__back-btn"
+                onClick={() => setShowSubtitleMenu(false)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowSubtitleMenu(false);
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M15.41 16.59L10.83 12L15.41 7.41L14 6L8 12L14 18L15.41 16.59Z" fill="white"/>
+                </svg>
+                Субтитры
+              </button>
+
+              <button
+                className={`video-player__settings-item ${currentSubtitleTrack === -1 ? 'video-player__settings-item--active' : ''}`}
+                onClick={() => handleSubtitleTrackChange(-1)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSubtitleTrackChange(-1);
+                }}
+              >
+                Выключено
+                {currentSubtitleTrack === -1 && (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
+                  </svg>
+                )}
+              </button>
+
+              {subtitleTracks.map((track, index) => (
+                <button
+                  key={index}
+                  className={`video-player__settings-item ${currentSubtitleTrack === index ? 'video-player__settings-item--active' : ''}`}
+                  onClick={() => handleSubtitleTrackChange(index)}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSubtitleTrackChange(index);
+                  }}
+                >
+                  {track.label || `Субтитры ${index + 1}`}
+                  {currentSubtitleTrack === index && (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
                     </svg>
