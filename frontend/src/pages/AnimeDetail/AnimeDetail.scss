@@ -27,11 +27,13 @@
     font-weight: 600;
     margin: 0;
     opacity: 0;
+    
     transition: opacity 0.3s ease;
-    white-space: nowrap;
+    white-space: wrap;
     overflow: hidden;
+    text-align: center;
     text-overflow: ellipsis;
-    max-width: 60%;
+    max-width: 50%;
     pointer-events: none;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 
