@@ -899,8 +899,6 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
           handleUserActivity();
         }}
       >
-
-       
         <div className="video-player__bottom">
           <div className="video-player__left">
              {/* Bottom Controls 
@@ -961,9 +959,14 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
           <div className="video-player__right">
             {/* Fullscreen */}
             <button
-              className="video-player__btn"
-              onClick={toggleFullscreen}
+              className="video-player__btn video-player__btn--fullscreen"
+              onClick={(e) => {
+                console.log('Fullscreen button clicked');
+                e.stopPropagation();
+                toggleFullscreen();
+              }}
               onTouchEnd={(e) => {
+                console.log('Fullscreen button touched');
                 e.preventDefault();
                 e.stopPropagation();
                 toggleFullscreen();
@@ -983,7 +986,8 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
             </button>
           </div>
         </div>
-                {/* Progress Bar */}
+
+        {/* Progress Bar */}
         <div
           className="video-player__progress"
           onClick={(e) => handleSeek(e, e.currentTarget)}
@@ -1001,7 +1005,6 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
             ></div>
           </div>
         </div>
-
       </div>
 
       {/* Buffering Indicator */}
