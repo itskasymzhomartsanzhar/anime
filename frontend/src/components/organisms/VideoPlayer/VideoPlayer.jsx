@@ -557,30 +557,43 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     try {
       const playerContainer = document.querySelector('.video-player');
 
-      if (!isFullscreen) {
-        // Войти в полноэкранный режим
+      // Check if already in fullscreen
+      const isCurrentlyFullscreen = !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      );
+
+      if (!isCurrentlyFullscreen) {
+        // Enter fullscreen mode
         if (playerContainer.requestFullscreen) {
           await playerContainer.requestFullscreen();
         } else if (playerContainer.webkitRequestFullscreen) {
+          // iOS Safari and older Chrome
           await playerContainer.webkitRequestFullscreen();
+        } else if (playerContainer.webkitEnterFullscreen) {
+          // iOS video element
+          await playerContainer.webkitEnterFullscreen();
         } else if (playerContainer.mozRequestFullScreen) {
           await playerContainer.mozRequestFullScreen();
         } else if (playerContainer.msRequestFullscreen) {
           await playerContainer.msRequestFullscreen();
         }
-        setIsFullscreen(true);
       } else {
-        // Выйти из полноэкранного режима
+        // Exit fullscreen mode
         if (document.exitFullscreen) {
           await document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
           await document.webkitExitFullscreen();
+        } else if (document.webkitCancelFullScreen) {
+          // iOS Safari
+          await document.webkitCancelFullScreen();
         } else if (document.mozCancelFullScreen) {
           await document.mozCancelFullScreen();
         } else if (document.msExitFullscreen) {
           await document.msExitFullscreen();
         }
-        setIsFullscreen(false);
       }
     } catch (error) {
       console.error('Error toggling fullscreen:', error);
