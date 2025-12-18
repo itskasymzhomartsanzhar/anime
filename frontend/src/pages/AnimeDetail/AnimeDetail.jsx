@@ -22,7 +22,7 @@ const AnimeDetail = () => {
 
   // Mock data
   const animeData = {
-    title: 'Название\nв две строки',
+    title: 'Названиев две строки, пример текста',
     subtitle: 'Слоган/Краткое описание',
     rating: '14+',
     type: 'Аниме',
@@ -153,7 +153,6 @@ const AnimeDetail = () => {
 
       {/* Info */}
       <div className="anime-detail__info">
-        <p className="anime-detail__subtitle">{animeData.subtitle}</p>
         <div className="anime-detail__meta">
           <span className="anime-detail__rating">{animeData.rating}</span>
           <span className="anime-detail__separator">|</span>
@@ -388,11 +387,11 @@ const AnimeDetail = () => {
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M18 6L6 18M6 6L18 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-              </button>
+              </button> 
             </div>
 
             <div className="anime-detail__modal-body">
-              <h2 className="anime-detail__modal-title">{animeData.title.replace('\n', ' ')}</h2>
+              <h2 className="anime-detail__modal-title">{animeData.title}</h2>
 
               <div className="anime-detail__modal-section">
                 <h3 className="anime-detail__modal-section-title">Описание</h3>

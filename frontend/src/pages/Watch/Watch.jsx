@@ -620,7 +620,7 @@ const [commentsData, setCommentsData] = useState([
                 </div>
               <p className="comments-modal__comment-text">{comment.text}</p>
               <div className="comments-modal__comment-actions">
-                {/*<button
+                <button
                   className={`comments-modal__action-btn ${likedComments[comment.id] ? 'comments-modal__action-btn--active' : ''}`}
                   onClick={() => handleLike(comment.id)}
                 >
@@ -636,7 +636,7 @@ const [commentsData, setCommentsData] = useState([
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M17 2V13M22 11V4C22 2.89543 21.1046 2 20 2H6.57377C5.09299 2 3.83379 3.08027 3.60863 4.54377L2.53167 11.5438C2.25209 13.3611 3.65819 15 5.49677 15H9C9.55228 15 10 15.4477 10 16V19.5342C10 20.896 11.104 22 12.4658 22C12.7907 22 13.085 21.8087 13.2169 21.5119L16.7361 13.5939C16.8966 13.2327 17.2547 13 17.6499 13H20C21.1046 13 22 12.1046 22 11Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
-                </button>*/}
+                </button>
                 <button className="comments-modal__action-btn" onClick={() => handleReply(comment.id)}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8 12H8.01M12 12H12.01M16 12H16.01M21 12C21 16.4183 16.9706 20 12 20C10.4607 20 9.01172 19.6565 7.74467 19.0511L3 20L4.39499 16.28C3.51156 15.0423 3 13.5743 3 12C3 7.58172 7.02944 4 12 4C16.9706 4 21 7.58172 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -761,6 +761,26 @@ const [commentsData, setCommentsData] = useState([
 
         {/* Audio and Subtitle Track Buttons */}
         <div className="watch__track-buttons">
+                    <div className="watch__rating-btn">
+            <button
+              className={`watch__rating-btn-like ${episodeLiked ? 'watch__rating-btn-like--active' : ''}`}
+              onClick={handleEpisodeLike}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 22V11M2 13V20C2 21.1046 2.89543 22 4 22H17.4262C18.907 22 20.1662 20.9197 20.3914 19.4562L21.4683 12.4562C21.7479 10.6389 20.3418 9 18.5032 9H15C14.4477 9 14 8.55228 14 8V4.46584C14 3.10399 12.896 2 11.5342 2C11.2093 2 10.915 2.1913 10.7831 2.48812L7.26394 10.4061C7.10344 10.7673 6.74532 11 6.35013 11H4C2.89543 11 2 11.8954 2 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>{episodeStats.likes}</span>
+            </button>
+            <div className="watch__rating-separator"></div>
+            <button
+              className={`watch__rating-btn-dislike ${episodeDisliked ? 'watch__rating-btn-dislike--active' : ''}`}
+              onClick={handleEpisodeDislike}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17 2V13M22 11V4C22 2.89543 21.1046 2 20 2H6.57377C5.09299 2 3.83379 3.08027 3.60863 4.54377L2.53167 11.5438C2.25209 13.3611 3.65819 15 5.49677 15H9C9.55228 15 10 15.4477 10 16V19.5342C10 20.896 11.104 22 12.4658 22C12.7907 22 13.085 21.8087 13.2169 21.5119L16.7361 13.5939C16.8966 13.2327 17.2547 13 17.6499 13H20C21.1046 13 22 12.1046 22 11Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
           <button
             className="watch__track-button watch__track-button--audio"
           >

@@ -11,38 +11,29 @@
 
     &__tabs {
         display: flex;
-        gap: 16px;
+        gap: 12px;
         padding: 0 15px;
-        margin-bottom: 8px;
+        margin-bottom: 24px;
     }
 
     &__tab {
-        background: none;
-        border: none;
-        color: #A0A0A0;
-        font-size: 16px;
-        font-weight: 600;
+        background: #1a1a1a;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
         cursor: pointer;
-        padding: 8px 0;
-        position: relative;
-        transition: color 0.3s;
-
-        &:hover {
-            color: #FFFFFF;
+        white-space: nowrap;
+        transition: all 0.2s;
+        &--active {
+        background: white;
+        color: #000000;
         }
 
-        &--active {
-            color: #FFFFFF;
-
-            &::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 2px;
-                background: rgba(255, 255, 255, 0.5);
-            }
+        &:active {
+        transform: scale(0.95);
         }
     }
 

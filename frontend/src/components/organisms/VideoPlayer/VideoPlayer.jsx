@@ -116,8 +116,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
           autoPlay: false,
           loop: false,
           muted: false,
-          fullscreenFallback: 'video',
-          preload: 'auto'  // Предзагрузка видео
+          preload: 'metadata',
         },
         ui: {
           mainPlayButton: false,  // Убираем нативную кнопку
@@ -127,6 +126,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
           timeIndicator: false,
           settingsButton: false,
           fullscreenButton: false,
+          cast: true,  // Включаем встроенную кнопку Chromecast
           watermark: false
         }
       }).then(async (player) => {
@@ -965,7 +965,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
 */}
             {/* Time */}
             <span className="video-player__time" title={`Raw: ${currentTime} / ${duration}`}>
-              {formatTime(currentTime)} / {formatTime(duration)}
+              {formatTime(currentTime)} <span className="video-player__time-duration">/ {formatTime(duration)}</span>
             </span>
           </div>
 
