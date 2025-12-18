@@ -116,6 +116,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
           autoPlay: false,
           loop: false,
           muted: false,
+          fullscreenFallback: 'video',
           preload: 'auto'  // Предзагрузка видео
         },
         ui: {
@@ -556,7 +557,18 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
 
   const toggleFullscreen = async () => {
     try {
-      // Check if already in fullscreen
+      // Try using Kinescope API first (works best on mobile)
+      if (playerRef.current && playerRef.current.requestFullscreen) {
+        try {
+          await playerRef.current.requestFullscreen();
+          console.log('Toggled fullscreen via Kinescope API');
+          return;
+        } catch (kinescopeError) {
+          console.log('Kinescope fullscreen not available, trying native API:', kinescopeError);
+        }
+      }
+
+      // Fallback to native fullscreen API
       const isCurrentlyFullscreen = !!(
         document.fullscreenElement ||
         document.webkitFullscreenElement ||
@@ -564,21 +576,10 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
         document.msFullscreenElement
       );
 
+      const playerContainer = document.querySelector('.video-player');
+
       if (!isCurrentlyFullscreen) {
-        // Try using Kinescope API first (works best on mobile)
-        if (playerRef.current) {
-          try {
-            await playerRef.current.enterFullscreen();
-            console.log('Entered fullscreen via Kinescope API');
-            return;
-          } catch (kinescopeError) {
-            console.log('Kinescope fullscreen not available, trying native API:', kinescopeError);
-          }
-        }
-
-        // Fallback to native fullscreen API
-        const playerContainer = document.querySelector('.video-player');
-
+        // Enter fullscreen
         if (playerContainer.requestFullscreen) {
           await playerContainer.requestFullscreen();
         } else if (playerContainer.webkitRequestFullscreen) {
@@ -593,18 +594,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
           await playerContainer.msRequestFullscreen();
         }
       } else {
-        // Try using Kinescope API first
-        if (playerRef.current) {
-          try {
-            await playerRef.current.exitFullscreen();
-            console.log('Exited fullscreen via Kinescope API');
-            return;
-          } catch (kinescopeError) {
-            console.log('Kinescope exit fullscreen not available, trying native API:', kinescopeError);
-          }
-        }
-
-        // Fallback to native exit fullscreen
+        // Exit fullscreen
         if (document.exitFullscreen) {
           await document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
