@@ -224,9 +224,6 @@
     cursor: pointer;
     transition: all 0.2s;
 
-    &:active {
-      transform: scale(0.95);
-    }
 
     svg {
       flex-shrink: 0;
@@ -234,6 +231,8 @@
   }
 
   &__rating-btn-like {
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    padding-right: 10px;
     &--active {
       color: #ff6b35;
 
@@ -253,13 +252,6 @@
 
       }
     }
-  }
-
-  &__rating-separator {
-    width: 1px;
-    height: 20px;
-    margin: 0 3px;
-    background: rgba(255, 255, 255, 0.2);
   }
 
   &__actions {
@@ -290,7 +282,11 @@
     transition: all 0.2s;
 
     &:active {
+      svg{
+
+  
       transform: scale(0.95);
+      }
     }
 
     &--liked {
