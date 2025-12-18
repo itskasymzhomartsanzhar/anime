@@ -141,10 +141,16 @@
     flex-direction: row;
     gap: 12px;
     padding: 0 16px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   &__track-button {
-    flex: 1;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -165,13 +171,11 @@
     svg {
       flex-shrink: 0;
       fill: #000;
-      
+
     }
 
     span {
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     &--audio {
@@ -208,6 +212,7 @@
     overflow: hidden;
     padding: 8px 14px;
     gap: 4px;
+    flex-shrink: 0;
   }
 
   &__rating-btn-like,

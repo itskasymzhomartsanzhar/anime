@@ -220,7 +220,7 @@ const [commentsData, setCommentsData] = useState([
     views: 100,
     daysAgo: 1,
     animeName: 'Название аниме',
-    videoUrl: 'https://kinescope.io/embed/txrAJjqu15gurctHqee8J5',
+    videoUrl: 'https://kinescope.io/embed/vnHvcupinokE6j2zgs6hnd',
     description: 'Захватывающая история о приключениях героя в волшебном мире, полном опасностей и неожиданных поворотов сюжета. Каждая серия держит в напряжении до самого конца. Главный герой сталкивается с множеством испытаний на своём пути.',
   };
 
@@ -761,7 +761,7 @@ const [commentsData, setCommentsData] = useState([
 
         {/* Audio and Subtitle Track Buttons */}
         <div className="watch__track-buttons">
-                    <div className="watch__rating-btn">
+            <div className="watch__rating-btn">
             <button
               className={`watch__rating-btn-like ${episodeLiked ? 'watch__rating-btn-like--active' : ''}`}
               onClick={handleEpisodeLike}
