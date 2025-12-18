@@ -74,6 +74,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
         document.mozFullScreenElement ||
         document.msFullscreenElement
       );
+      console.log(isCurrentlyFullscreen);
       setIsFullscreen(isCurrentlyFullscreen);
     };
 
@@ -555,8 +556,6 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
 
   const toggleFullscreen = async () => {
     try {
-      const playerContainer = document.querySelector('.video-player');
-
       // Check if already in fullscreen
       const isCurrentlyFullscreen = !!(
         document.fullscreenElement ||
@@ -566,7 +565,20 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
       );
 
       if (!isCurrentlyFullscreen) {
-        // Enter fullscreen mode
+        // Try using Kinescope API first (works best on mobile)
+        if (playerRef.current) {
+          try {
+            await playerRef.current.enterFullscreen();
+            console.log('Entered fullscreen via Kinescope API');
+            return;
+          } catch (kinescopeError) {
+            console.log('Kinescope fullscreen not available, trying native API:', kinescopeError);
+          }
+        }
+
+        // Fallback to native fullscreen API
+        const playerContainer = document.querySelector('.video-player');
+
         if (playerContainer.requestFullscreen) {
           await playerContainer.requestFullscreen();
         } else if (playerContainer.webkitRequestFullscreen) {
@@ -581,7 +593,18 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
           await playerContainer.msRequestFullscreen();
         }
       } else {
-        // Exit fullscreen mode
+        // Try using Kinescope API first
+        if (playerRef.current) {
+          try {
+            await playerRef.current.exitFullscreen();
+            console.log('Exited fullscreen via Kinescope API');
+            return;
+          } catch (kinescopeError) {
+            console.log('Kinescope exit fullscreen not available, trying native API:', kinescopeError);
+          }
+        }
+
+        // Fallback to native exit fullscreen
         if (document.exitFullscreen) {
           await document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
