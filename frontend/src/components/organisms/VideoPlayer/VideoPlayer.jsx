@@ -32,7 +32,6 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
   const centerButtonTimeoutRef = useRef(null);
   const isDraggingRef = useRef(false);
   const dragTimeRef = useRef(0);
-  const animationFrameRef = useRef(null);
   const playbackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
   // Extract video ID from URL
@@ -446,19 +445,15 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     if (!progressBar) return;
 
     isDraggingRef.current = true;
-    let lastUpdateTime = 0;
-    const throttleDelay = 16; // ~60fps
+    const progressBarInner = progressBar.querySelector('.video-player__progress-bar');
+    const timeDisplay = document.querySelector('.video-player__time');
 
     const handleMove = (moveEvent) => {
       if (!isDraggingRef.current) return;
 
       moveEvent.preventDefault();
 
-      if (!playerRef.current || !duration) return;
-
-      const now = Date.now();
-      if (now - lastUpdateTime < throttleDelay) return;
-      lastUpdateTime = now;
+      if (!duration) return;
 
       const rect = progressBar.getBoundingClientRect();
       const clientX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0]?.clientX);
@@ -467,31 +462,28 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
 
       dragTimeRef.current = time;
 
-      // Cancel previous animation frame
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      // Update DOM directly without React state - instant visual feedback
+      if (progressBarInner) {
+        progressBarInner.style.width = `${pos * 100}%`;
       }
-
-      // Update visual state and seek in one animation frame
-      animationFrameRef.current = requestAnimationFrame(() => {
-        setCurrentTime(time);
-        if (isDraggingRef.current && playerRef.current) {
-          playerRef.current.seekTo(time);
-        }
-      });
+      if (timeDisplay) {
+        const formattedTime = formatTime(time);
+        const formattedDuration = formatTime(duration);
+        timeDisplay.innerHTML = `${formattedTime} <span class="video-player__time-duration">/ ${formattedDuration}</span>`;
+      }
     };
 
     const handleEnd = () => {
       isDraggingRef.current = false;
 
-      // Final seek to ensure accuracy
-      if (playerRef.current && dragTimeRef.current !== undefined) {
-        playerRef.current.seekTo(dragTimeRef.current);
-      }
+      // Sync React state with final value
+      if (dragTimeRef.current !== undefined) {
+        setCurrentTime(dragTimeRef.current);
 
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
+        // Seek video to final position
+        if (playerRef.current) {
+          playerRef.current.seekTo(dragTimeRef.current);
+        }
       }
 
       // Restart auto-hide timer after dragging ends
@@ -519,6 +511,9 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     document.addEventListener('mouseup', handleEnd);
     document.addEventListener('touchmove', handleMove, { passive: false });
     document.addEventListener('touchend', handleEnd);
+
+    // Initial update
+    handleMove(e);
   };
 
   const handleVolumeChange = (e) => {
