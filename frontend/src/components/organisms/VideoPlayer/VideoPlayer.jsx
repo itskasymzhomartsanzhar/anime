@@ -125,7 +125,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
           mainPlayButton: false,  // Убираем нативную кнопку
           playButton: false,
           volumeButton: false,
-          progressBar: false,
+          progressBar: true,
           timeIndicator: false,
           settingsButton: false,
           fullscreenButton: false,
@@ -446,6 +446,17 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     if (!progressBar) return;
 
     isDraggingRef.current = true;
+
+    // Clear auto-hide timers when starting drag
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+      controlsTimeoutRef.current = null;
+    }
+    if (centerButtonTimeoutRef.current) {
+      clearTimeout(centerButtonTimeoutRef.current);
+      centerButtonTimeoutRef.current = null;
+    }
+
     let lastUpdateTime = 0;
     const throttleDelay = 16; // ~60fps
 
