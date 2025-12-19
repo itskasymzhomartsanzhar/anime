@@ -446,6 +446,17 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     if (!progressBar) return;
 
     isDraggingRef.current = true;
+
+    // Clear any existing hide timeouts when starting drag
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+      controlsTimeoutRef.current = null;
+    }
+    if (centerButtonTimeoutRef.current) {
+      clearTimeout(centerButtonTimeoutRef.current);
+      centerButtonTimeoutRef.current = null;
+    }
+
     const progressBarInner = progressBar.querySelector('.video-player__progress-bar');
     const timeDisplay = document.querySelector('.video-player__time');
 
@@ -510,11 +521,8 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
         }
       }
 
-      // Restart auto-hide timer
+      // Restart auto-hide timer after dragging ends
       if (isPlaying) {
-        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-        if (centerButtonTimeoutRef.current) clearTimeout(centerButtonTimeoutRef.current);
-
         controlsTimeoutRef.current = setTimeout(() => {
           setShowControls(false);
           setShowCenterButton(false);
