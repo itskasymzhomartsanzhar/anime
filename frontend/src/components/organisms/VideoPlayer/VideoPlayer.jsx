@@ -30,6 +30,9 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
 
   const controlsTimeoutRef = useRef(null);
   const centerButtonTimeoutRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const dragTimeRef = useRef(0);
+  const animationFrameRef = useRef(null);
   const playbackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
   // Extract video ID from URL
@@ -436,39 +439,76 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
   };
 
   const handleHandleMouseDown = (e) => {
-    e.stopPropagation(); // Prevent triggering progress bar click
-    e.preventDefault(); // Prevent default touch behavior
+    e.stopPropagation();
+    e.preventDefault();
 
     const progressBar = e.currentTarget.closest('.video-player__progress');
     if (!progressBar) return;
 
-    let isDragging = true;
+    isDraggingRef.current = true;
+    let lastUpdateTime = 0;
+    const throttleDelay = 16; // ~60fps
 
     const handleMove = (moveEvent) => {
-      if (!isDragging) return;
+      if (!isDraggingRef.current) return;
 
-      moveEvent.preventDefault(); // Prevent scrolling while dragging
+      moveEvent.preventDefault();
 
       if (!playerRef.current || !duration) return;
+
+      const now = Date.now();
+      if (now - lastUpdateTime < throttleDelay) return;
+      lastUpdateTime = now;
 
       const rect = progressBar.getBoundingClientRect();
       const clientX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0]?.clientX);
       const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
       const time = pos * duration;
 
-      // Update visual state immediately without seeking
-      setCurrentTime(time);
+      dragTimeRef.current = time;
 
-      // Use requestAnimationFrame for smooth updates
-      requestAnimationFrame(() => {
-        if (isDragging && playerRef.current) {
+      // Cancel previous animation frame
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+
+      // Update visual state and seek in one animation frame
+      animationFrameRef.current = requestAnimationFrame(() => {
+        setCurrentTime(time);
+        if (isDraggingRef.current && playerRef.current) {
           playerRef.current.seekTo(time);
         }
       });
     };
 
     const handleEnd = () => {
-      isDragging = false;
+      isDraggingRef.current = false;
+
+      // Final seek to ensure accuracy
+      if (playerRef.current && dragTimeRef.current !== undefined) {
+        playerRef.current.seekTo(dragTimeRef.current);
+      }
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+
+      // Restart auto-hide timer after dragging ends
+      if (isPlaying) {
+        if (controlsTimeoutRef.current) {
+          clearTimeout(controlsTimeoutRef.current);
+        }
+        if (centerButtonTimeoutRef.current) {
+          clearTimeout(centerButtonTimeoutRef.current);
+        }
+
+        controlsTimeoutRef.current = setTimeout(() => {
+          setShowControls(false);
+          setShowCenterButton(false);
+        }, 3000);
+      }
+
       document.removeEventListener('mousemove', handleMove);
       document.removeEventListener('mouseup', handleEnd);
       document.removeEventListener('touchmove', handleMove);
@@ -683,6 +723,11 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     }
     if (centerButtonTimeoutRef.current) {
       clearTimeout(centerButtonTimeoutRef.current);
+    }
+
+    // Don't hide controls if dragging progress bar
+    if (isDraggingRef.current) {
+      return;
     }
 
     // Hide controls after 3 seconds of no activity (only if playing)
