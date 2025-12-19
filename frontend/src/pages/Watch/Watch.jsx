@@ -716,7 +716,6 @@ const [commentsData, setCommentsData] = useState([
           onTracksUpdate={handleTracksUpdate}
         />
       </div>
-
       {/* Episode Info */}
       <div className="watch__info">
         <div className="watch__header">
