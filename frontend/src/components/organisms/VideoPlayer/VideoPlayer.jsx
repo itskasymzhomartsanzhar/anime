@@ -446,37 +446,49 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     if (!progressBar) return;
 
     isDraggingRef.current = true;
-    let lastUpdateTime = 0;
-    const throttleDelay = 16; // ~60fps
+    const progressBarInner = progressBar.querySelector('.video-player__progress-bar');
+    const timeDisplay = document.querySelector('.video-player__time');
 
     const handleMove = (moveEvent) => {
       if (!isDraggingRef.current) return;
-
       moveEvent.preventDefault();
-
-      if (!playerRef.current || !duration) return;
-
-      const now = Date.now();
-      if (now - lastUpdateTime < throttleDelay) return;
-      lastUpdateTime = now;
+      if (!duration) return;
 
       const rect = progressBar.getBoundingClientRect();
-      const clientX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0]?.clientX);
+      const clientX = moveEvent.clientX || (moveEvent.touches?.[0]?.clientX);
+      if (!clientX) return;
+
       const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
       const time = pos * duration;
-
       dragTimeRef.current = time;
 
-      // Cancel previous animation frame
+      // Cancel previous frame to prevent queuing
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
 
-      // Update visual state and seek in one animation frame
+      // Use RAF for smooth 60fps updates
       animationFrameRef.current = requestAnimationFrame(() => {
-        setCurrentTime(time);
-        if (isDraggingRef.current && playerRef.current) {
-          playerRef.current.seekTo(time);
+        // Direct DOM manipulation - fastest possible
+        if (progressBarInner) {
+          progressBarInner.style.width = `${pos * 100}%`;
+        }
+        if (timeDisplay) {
+          const h = Math.floor(time / 3600);
+          const m = Math.floor((time % 3600) / 60);
+          const s = Math.floor(time % 60);
+          const formatted = h > 0
+            ? `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+            : `${m}:${s.toString().padStart(2, '0')}`;
+
+          const dh = Math.floor(duration / 3600);
+          const dm = Math.floor((duration % 3600) / 60);
+          const ds = Math.floor(duration % 60);
+          const durationFormatted = dh > 0
+            ? `${dh}:${dm.toString().padStart(2, '0')}:${ds.toString().padStart(2, '0')}`
+            : `${dm}:${ds.toString().padStart(2, '0')}`;
+
+          timeDisplay.innerHTML = `${formatted} <span class="video-player__time-duration">/ ${durationFormatted}</span>`;
         }
       });
     };
@@ -484,14 +496,29 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     const handleEnd = () => {
       isDraggingRef.current = false;
 
-      // Final seek to ensure accuracy
-      if (playerRef.current && dragTimeRef.current !== undefined) {
-        playerRef.current.seekTo(dragTimeRef.current);
-      }
-
+      // Cancel any pending animation frame
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
+      }
+
+      // Sync React state and seek video only once at the end
+      if (dragTimeRef.current !== undefined) {
+        setCurrentTime(dragTimeRef.current);
+        if (playerRef.current) {
+          playerRef.current.seekTo(dragTimeRef.current);
+        }
+      }
+
+      // Restart auto-hide timer
+      if (isPlaying) {
+        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+        if (centerButtonTimeoutRef.current) clearTimeout(centerButtonTimeoutRef.current);
+
+        controlsTimeoutRef.current = setTimeout(() => {
+          setShowControls(false);
+          setShowCenterButton(false);
+        }, 3000);
       }
 
       document.removeEventListener('mousemove', handleMove);
@@ -500,10 +527,13 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
       document.removeEventListener('touchend', handleEnd);
     };
 
-    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mousemove', handleMove, { passive: false });
     document.addEventListener('mouseup', handleEnd);
     document.addEventListener('touchmove', handleMove, { passive: false });
     document.addEventListener('touchend', handleEnd);
+
+    // Trigger initial update
+    handleMove(e);
   };
 
   const handleVolumeChange = (e) => {

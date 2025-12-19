@@ -183,6 +183,9 @@
     cursor: pointer;
     position: relative;
     transition: height 0.2s;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
 
     &:hover {
       height: 8px;
@@ -193,7 +196,8 @@
     height: 100%;
     background: #FF6B35;
     position: relative;
-    transition: width 0.05s linear;
+    will-change: width;
+    transition: none;
   }
  
   &__progress-handle {
@@ -209,6 +213,9 @@
     z-index: 999999999;
     transition: opacity 0.2s;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
 
     .video-player__progress:hover & {
       opacity: 1;
