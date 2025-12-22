@@ -624,21 +624,21 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                   (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
 
-    // Для iOS используем Kinescope API напрямую
+    // Для iOS используем псевдо-fullscreen через CSS
     if (isIOS) {
-      if (playerRef.current?.requestFullscreen) {
-        playerRef.current.requestFullscreen().catch(err => {
-          console.log('iOS Kinescope fullscreen error:', err);
-          // Fallback: пробуем найти video элемент внутри iframe
-          try {
-            const iframe = document.querySelector('.video-player__iframe iframe');
-            if (iframe && iframe.contentWindow) {
-              iframe.contentWindow.postMessage({ method: 'requestFullscreen' }, '*');
-            }
-          } catch (e) {
-            console.log('iOS iframe fullscreen fallback error:', e);
-          }
-        });
+      const playerContainer = document.querySelector('.video-player');
+      if (!playerContainer) return;
+
+      if (isFullscreen) {
+        // Выходим из псевдо-fullscreen
+        playerContainer.classList.remove('video-player--ios-fullscreen');
+        document.body.style.overflow = '';
+        setIsFullscreen(false);
+      } else {
+        // Входим в псевдо-fullscreen
+        playerContainer.classList.add('video-player--ios-fullscreen');
+        document.body.style.overflow = 'hidden';
+        setIsFullscreen(true);
       }
       return;
     }
