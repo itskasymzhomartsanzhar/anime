@@ -618,64 +618,74 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
     }
   };
 
-  const toggleFullscreen = async () => {
-    try {
-      // Try using Kinescope API first (works best on mobile)
-      if (playerRef.current && playerRef.current.requestFullscreen) {
-        try {
-          await playerRef.current.requestFullscreen();
-          console.log('Toggled fullscreen via Kinescope API');
-          return;
-        } catch (kinescopeError) {
-          console.log('Kinescope fullscreen not available, trying native API:', kinescopeError);
-        }
+  const toggleFullscreen = () => {
+  try {
+    // Определяем iOS (включая iPad на iPadOS 13+)
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                  (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
+
+    // Для iOS используем Kinescope API напрямую
+    if (isIOS) {
+      if (playerRef.current?.requestFullscreen) {
+        playerRef.current.requestFullscreen().catch(err => {
+          console.log('iOS Kinescope fullscreen error:', err);
+          // Fallback: пробуем найти video элемент внутри iframe
+          try {
+            const iframe = document.querySelector('.video-player__iframe iframe');
+            if (iframe && iframe.contentWindow) {
+              iframe.contentWindow.postMessage({ method: 'requestFullscreen' }, '*');
+            }
+          } catch (e) {
+            console.log('iOS iframe fullscreen fallback error:', e);
+          }
+        });
       }
+      return;
+    }
 
-      // Fallback to native fullscreen API
-      const isCurrentlyFullscreen = !!(
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement
-      );
+    // Для Android и Desktop используем стандартный API
+    const isCurrentlyFullscreen = !!(
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement
+    );
 
+    if (!isCurrentlyFullscreen) {
+      // Входим в fullscreen - синхронный вызов без async/await
       const playerContainer = document.querySelector('.video-player');
 
-      if (!isCurrentlyFullscreen) {
-        // Enter fullscreen
-        if (playerContainer.requestFullscreen) {
-          await playerContainer.requestFullscreen();
-        } else if (playerContainer.webkitRequestFullscreen) {
-          // iOS Safari and older Chrome
-          await playerContainer.webkitRequestFullscreen();
-        } else if (playerContainer.webkitEnterFullscreen) {
-          // iOS video element
-          await playerContainer.webkitEnterFullscreen();
-        } else if (playerContainer.mozRequestFullScreen) {
-          await playerContainer.mozRequestFullScreen();
-        } else if (playerContainer.msRequestFullscreen) {
-          await playerContainer.msRequestFullscreen();
-        }
-      } else {
-        // Exit fullscreen
-        if (document.exitFullscreen) {
-          await document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          await document.webkitExitFullscreen();
-        } else if (document.webkitCancelFullScreen) {
-          // iOS Safari
-          await document.webkitCancelFullScreen();
-        } else if (document.mozCancelFullScreen) {
-          await document.mozCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-          await document.msExitFullscreen();
-        }
-      }
-    } catch (error) {
-      console.error('Error toggling fullscreen:', error);
-    }
-  };
+      if (!playerContainer) return;
 
+      // Пробуем разные API синхронно
+      if (playerContainer.requestFullscreen) {
+        playerContainer.requestFullscreen().catch(err => console.log('Fullscreen error:', err));
+      } else if (playerContainer.webkitRequestFullscreen) {
+        playerContainer.webkitRequestFullscreen();
+      } else if (playerContainer.mozRequestFullScreen) {
+        playerContainer.mozRequestFullScreen();
+      } else if (playerContainer.msRequestFullscreen) {
+        playerContainer.msRequestFullscreen();
+      } else if (playerRef.current?.requestFullscreen) {
+        // Fallback на Kinescope API
+        playerRef.current.requestFullscreen().catch(err => console.log('Kinescope fullscreen error:', err));
+      }
+    } else {
+      // Выходим из fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.log('Exit fullscreen error:', err));
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+  } catch (error) {
+    console.error('Fullscreen toggle error:', error);
+  }
+};
   const handlePictureInPicture = async () => {
     try {
       // Пытаемся активировать Picture-in-Picture через Kinescope API
@@ -1043,12 +1053,6 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
               className="video-player__btn video-player__btn--fullscreen"
               onClick={(e) => {
                 console.log('Fullscreen button clicked');
-                e.stopPropagation();
-                toggleFullscreen();
-              }}
-              onTouchEnd={(e) => {
-                console.log('Fullscreen button touched');
-                e.preventDefault();
                 e.stopPropagation();
                 toggleFullscreen();
               }}
