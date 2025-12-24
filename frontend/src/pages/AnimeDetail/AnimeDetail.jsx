@@ -25,7 +25,7 @@ const AnimeDetail = () => {
     title: 'Названиев две строки, пример текста',
     subtitle: 'Слоган/Краткое описание',
     rating: '14+',
-    type: 'Аниме',
+    type: 'Дубляж | Субтитры',
     score: '8.73',
     poster: placeholder,
     description: 'Захватывающая история о приключениях героя в волшебном мире, полном опасностей и неожиданных поворотов сюжета. Каждая серия держит в напряжении до самого конца.',
@@ -51,9 +51,9 @@ const AnimeDetail = () => {
   ];
 
   const episodes = [
-    { id: 1, number: 1, title: 'Название', duration: '24m', isViewed: false },
-    { id: 2, number: 2, title: 'Название', duration: '24m', isViewed: true },
-    { id: 3, number: 3, title: 'Название', duration: '24m left', isViewed: false },
+    { id: 1, number: 1, title: 'Название', duration: '24:12', isViewed: false },
+    { id: 2, number: 2, title: 'Название', duration: '23:45', isViewed: true },
+    { id: 3, number: 3, title: 'Название', duration: '24:00', isViewed: false },
   ];
 
   const filters = ['Новые', 'Старые', 'Похожие'];
@@ -160,7 +160,7 @@ const AnimeDetail = () => {
           <span className="anime-detail__separator">|</span>
           <span className="anime-detail__score">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FF6B35" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#F59E0B" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             {animeData.score}
           </span>
@@ -242,24 +242,29 @@ const AnimeDetail = () => {
               ))}
             </div>
 
-            {/* Season Info */}
-            <div className="anime-detail__season-info">
-              <h3 className="anime-detail__season-title">С1- Название сезона</h3>
-              <p className="anime-detail__episode-count">Эпизод 21</p>
-            </div>
+            {activeTab !== 'all-seasons' ? (
+              <>
+                <div className="anime-detail__season-info">
+                  <h3 className="anime-detail__season-title">С1- Название сезона</h3>
+                  <p className="anime-detail__episode-count">Эпизод 21</p>
+                </div>
 
-            {/* Filters */}
-            <div className="anime-detail__filters">
-              {filters.map((filter) => (
-                <button
-                  key={filter}
-                  className={`anime-detail__filter-btn ${selectedFilter === filter ? 'anime-detail__filter-btn--active' : ''}`}
-                  onClick={() => setSelectedFilter(filter)}
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
+                <div className="anime-detail__filters">
+                  {filters.map((filter) => (
+                    <button
+                      key={filter}
+                      className={`anime-detail__filter-btn ${selectedFilter === filter ? 'anime-detail__filter-btn--active' : ''}`}
+                      onClick={() => setSelectedFilter(filter)}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
+
           </div>
         )}
       </div>
@@ -272,8 +277,10 @@ const AnimeDetail = () => {
         // All Seasons Grid
         <div className="anime-detail__all-seasons">
           <div className="anime-detail__season-header">
-            <h3>Название аниме: Все сезоны</h3>
-            <p>{allSeasons.length} сезонов</p>
+            <div className="anime-detail__season-info">
+              <h3 className="anime-detail__season-title">Название Аниме: Все сезоны</h3>
+              <p className="anime-detail__episode-count">4 сезона</p>
+            </div>
           </div>
           <div className="anime-detail__seasons-grid">
             {allSeasons.map((season) => (
@@ -302,6 +309,7 @@ const AnimeDetail = () => {
               <div key={episode.id} className="anime-detail__episode">
                 <div className="anime-detail__episode-poster" style={{ backgroundImage: `url(${placeholder})` }}>
                   {episode.isViewed && <div className="anime-detail__episode-viewed"></div>}
+                  <span className="anime-detail__episode-duration">{episode.duration || '24:00'}</span>
                 </div>
                 <div className="anime-detail__episode-content">
                   <div className="anime-detail__episode-info">
@@ -314,10 +322,10 @@ const AnimeDetail = () => {
                     className="anime-detail__episode-menu"
                     onClick={(e) => handleEpisodeMenuClick(episode, e)}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="12" cy="5" r="1.5" fill="white"/>
-                      <circle cx="12" cy="12" r="1.5" fill="white"/>
-                      <circle cx="12" cy="19" r="1.5" fill="white"/>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="5" r="2.5" fill="white"/>
+                      <circle cx="12" cy="12" r="2.5" fill="white"/>
+                      <circle cx="12" cy="19" r="2.5" fill="white"/>
                     </svg>
                   </button>
                 </div>

@@ -27,7 +27,7 @@ const Catalog = () => {
   const categories = ['Популярные', 'Категория1', 'Категория2', 'Категория3', 'Категория4'];
   const letters = ['#', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'];
   const years = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
-  const seasons = ['Winter', 'Spring', 'Summer', 'Fall'];
+  const seasons = ['Зима', 'Весна', 'Лето', 'Осень'];
 
   const handleBack = () => {
     navigate(-1);
@@ -142,18 +142,20 @@ const Catalog = () => {
               <>
                 <div className="catalog__year-header">
                   <button className="catalog__year-nav" onClick={() => setSelectedYear(selectedYear - 1)}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9.16667 17.4166L2.75 10.9999M2.75 10.9999L9.16667 4.58325M2.75 10.9999L19.25 10.9999" stroke="white" stroke-width="1.57143" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+
                   </button>
                   <h2 className="catalog__year-current">{selectedYear}</h2>
                   <button className="catalog__year-nav" onClick={() => setSelectedYear(selectedYear + 1)}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.8333 17.4166L19.25 10.9999M19.25 10.9999L12.8333 4.58325M19.25 10.9999L2.75 10.9999" stroke="white" stroke-width="1.57143" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
+
                   </button>
                   <button className="catalog__year-close" onClick={() => setSelectedYear(null)}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="22" height="22" viewBox="0 0 22 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M18 6L6 18M6 6L18 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>

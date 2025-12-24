@@ -32,6 +32,8 @@ const Watch = () => {
     subtitleTracks: [],
     currentSubtitleTrack: -1
   });
+  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+  const [isSubtitlesEnabled, setIsSubtitlesEnabled] = useState(false);
 
   // Callbacks for opening menus
   const handleOpenAudioMenu = useCallback((func) => {
@@ -44,6 +46,16 @@ const Watch = () => {
 
   const handleTracksUpdate = useCallback((info) => {
     setTrackInfo(info);
+  }, []);
+
+  // Toggle audio track
+  const handleToggleAudio = useCallback(() => {
+    setIsAudioEnabled(prev => !prev);
+  }, []);
+
+  // Toggle subtitles
+  const handleToggleSubtitles = useCallback(() => {
+    setIsSubtitlesEnabled(prev => !prev);
   }, []);
 const [commentsData, setCommentsData] = useState([
   {
@@ -625,7 +637,7 @@ const [commentsData, setCommentsData] = useState([
                   onClick={() => handleLike(comment.id)}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7 22V11M2 13V20C2 21.1046 2.89543 22 4 22H17.4262C18.907 22 20.1662 20.9197 20.3914 19.4562L21.4683 12.4562C21.7479 10.6389 20.3418 9 18.5032 9H15C14.4477 9 14 8.55228 14 8V4.46584C14 3.10399 12.896 2 11.5342 2C11.2093 2 10.915 2.1913 10.7831 2.48812L7.26394 10.4061C7.10344 10.7673 6.74532 11 6.35013 11H4C2.89543 11 2 11.8954 2 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M7 22V11M2 13V20C2 21.1046 2.89543 22 4 22H17.4262C18.907 22 20.1662 20.9197 20.3914 19.4562L21.4683 12.4562C21.7479 10.6389 20.3418 9 18.5032 9H15C14.4477 9 14 8.55228 14 8V4.46584C14 3.10399 12.896 2 11.5342 2C11.2093 2 10.915 2.1913 10.7831 2.48812L7.26394 10.4061C7.10344 10.7673 6.74532 11 6.35013 11H4C2.89543 11 2 11.8954 2 13Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   {formatNumber(comment.likes)}
                 </button>
@@ -634,7 +646,7 @@ const [commentsData, setCommentsData] = useState([
                   onClick={() => handleDislike(comment.id)}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17 2V13M22 11V4C22 2.89543 21.1046 2 20 2H6.57377C5.09299 2 3.83379 3.08027 3.60863 4.54377L2.53167 11.5438C2.25209 13.3611 3.65819 15 5.49677 15H9C9.55228 15 10 15.4477 10 16V19.5342C10 20.896 11.104 22 12.4658 22C12.7907 22 13.085 21.8087 13.2169 21.5119L16.7361 13.5939C16.8966 13.2327 17.2547 13 17.6499 13H20C21.1046 13 22 12.1046 22 11Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M17 2V13M22 11V4C22 2.89543 21.1046 2 20 2H6.57377C5.09299 2 3.83379 3.08027 3.60863 4.54377L2.53167 11.5438C2.25209 13.3611 3.65819 15 5.49677 15H9C9.55228 15 10 15.4477 10 16V19.5342C10 20.896 11.104 22 12.4658 22C12.7907 22 13.085 21.8087 13.2169 21.5119L16.7361 13.5939C16.8966 13.2327 17.2547 13 17.6499 13H20C21.1046 13 22 12.1046 22 11Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
                 <button className="comments-modal__action-btn" onClick={() => handleReply(comment.id)}>
@@ -643,14 +655,7 @@ const [commentsData, setCommentsData] = useState([
                   </svg>
                   {formatNumber(comment.comments)}
                 </button>
-                {showReplyButton && (
-                  <button
-                    className="comments-modal__action-btn comments-modal__reply-btn"
-                    onClick={() => handleReply(comment.id)}
-                  >
-                    Ответить
-                  </button>
-                )}
+
               
               </div>
               </div>
@@ -781,7 +786,8 @@ const [commentsData, setCommentsData] = useState([
             </button>
           </div>
           <button
-            className="watch__track-button watch__track-button--audio"
+            className={`watch__track-button watch__track-button--audio ${isAudioEnabled ? 'watch__track-button--active' : ''}`}
+            onClick={handleToggleAudio}
           >
             <svg width="13" height="16" viewBox="0 0 13 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 <path d="M9.13885 3.2505C9.13885 1.77738 7.74663 0.583496 6.02774 0.583496C4.30885 0.583496 2.91663 1.77738 2.91663 3.2505V7.24983C2.91663 8.72294 4.30885 9.91683 6.02774 9.91683C7.74663 9.91683 9.13885 8.72294 9.13885 7.24983V3.2505Z" stroke="currentColor" stroke-width="1.16667" stroke-linecap="round" stroke-linejoin="round"/>
@@ -791,7 +797,8 @@ const [commentsData, setCommentsData] = useState([
             <span>{trackInfo.audioTracks[trackInfo.currentAudioTrack]?.label || 'Аудиодорожка'}</span>
           </button>
           <button
-            className="watch__track-button watch__track-button--subtitle"
+            className={`watch__track-button watch__track-button--subtitle ${isSubtitlesEnabled ? 'watch__track-button--active' : ''}`}
+            onClick={handleToggleSubtitles}
           >
 <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M0 1.2C0 0.537259 0.537258 0 1.2 0H13.2C13.8627 0 14.4 0.537258 14.4 1.2V10.8C14.4 11.4627 13.8627 12 13.2 12H1.2C0.537258 12 0 11.4627 0 10.8V1.2ZM1.2 0.8C0.979086 0.8 0.8 0.979086 0.8 1.2V10.8C0.8 11.0209 0.979086 11.2 1.2 11.2H13.2C13.4209 11.2 13.6 11.0209 13.6 10.8V1.2C13.6 0.979086 13.4209 0.8 13.2 0.8H1.2Z" fill="currentColor"/>
@@ -838,7 +845,7 @@ const [commentsData, setCommentsData] = useState([
             className="watch__comments-header"
             onClick={handleOpenCommentsModal}
           >
-            <span>Комментарии <span className='watch__comments--gray'>{commentsData.length}</span></span>
+            <span className='watch__comments-mainheader'>Комментарии <span className='watch__comments--gray'>{commentsData.length}</span></span>
 
             <svg width="15" height="21" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M8.125 9.75L5 12.875L1.875 9.75" stroke="#6C6C6C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

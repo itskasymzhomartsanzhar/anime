@@ -92,15 +92,15 @@
   &__search-icon {
     position: absolute;
     left: 16px;
-    color: rgba(255, 255, 255, 0.6);
+    color: #A0A0A0;
     pointer-events: none;
   }
 
   &__input {
     width: 100%;
     padding: 14px 48px 14px 48px;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
+    background: #272727;
+    border: 1px solid #A0A0A0;
     border-radius: 12px;
     color: #fff;
     font-size: 16px;
@@ -112,7 +112,7 @@
     }
 
     &:focus {
-      border-color: #ff6b35;
+      border-color: #EE6A2F;
     }
   }
 

@@ -181,7 +181,11 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
             if (Array.isArray(qualityList) && qualityList.length > 0) {
               const filteredQualities = qualityList.filter(
                 (q) => q !== 'auto' && q?.id !== 'auto'
-              );
+              ).sort((a, b) => {
+                const heightA = parseInt(a.label || a.height || 0);
+                const heightB = parseInt(b.label || b.height || 0);
+                return heightB - heightA; // Sort from highest to lowest
+              });
 
               console.log('Filtered qualities:', filteredQualities);
               setQualities(filteredQualities);
@@ -907,9 +911,11 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
             }}
             title="Настройки"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M19.14 12.94C19.18 12.64 19.2 12.33 19.2 12C19.2 11.68 19.18 11.36 19.13 11.06L21.16 9.48C21.34 9.34 21.39 9.07 21.28 8.87L19.36 5.55C19.24 5.33 18.99 5.26 18.77 5.33L16.38 6.29C15.88 5.91 15.35 5.59 14.76 5.35L14.4 2.81C14.36 2.57 14.16 2.4 13.92 2.4H10.08C9.83999 2.4 9.64999 2.57 9.60999 2.81L9.24999 5.35C8.65999 5.59 8.11999 5.92 7.62999 6.29L5.23999 5.33C5.01999 5.25 4.76999 5.33 4.64999 5.55L2.73999 8.87C2.61999 9.08 2.65999 9.34 2.85999 9.48L4.88999 11.06C4.83999 11.36 4.79999 11.69 4.79999 12C4.79999 12.31 4.81999 12.64 4.86999 12.94L2.83999 14.52C2.65999 14.66 2.60999 14.93 2.71999 15.13L4.63999 18.45C4.75999 18.67 5.00999 18.74 5.22999 18.67L7.61999 17.71C8.11999 18.09 8.64999 18.41 9.23999 18.65L9.59999 21.19C9.64999 21.43 9.83999 21.6 10.08 21.6H13.92C14.16 21.6 14.36 21.43 14.39 21.19L14.75 18.65C15.34 18.41 15.88 18.09 16.37 17.71L18.76 18.67C18.98 18.75 19.23 18.67 19.35 18.45L21.27 15.13C21.39 14.91 21.34 14.66 21.15 14.52L19.14 12.94ZM12 15.6C10.02 15.6 8.39999 13.98 8.39999 12C8.39999 10.02 10.02 8.4 12 8.4C13.98 8.4 15.6 10.02 15.6 12C15.6 13.98 13.98 15.6 12 15.6Z" fill="white"/>
-            </svg>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M9.5068 2.4178C9.54698 2.17671 9.75558 2 10 2H14C14.2444 2 14.453 2.17671 14.4932 2.4178L14.9399 5.09828C15.5003 5.33725 16.0254 5.64235 16.5056 6.00368L19.0519 5.04975C19.2807 4.964 19.5381 5.0563 19.6603 5.26797L21.6603 8.73208C21.7825 8.94375 21.7337 9.21275 21.545 9.3681L19.446 11.0961C19.4817 11.3926 19.5 11.6943 19.5 12C19.5 12.3058 19.4817 12.6075 19.446 12.904L21.545 14.632C21.7337 14.7873 21.7825 15.0563 21.6603 15.268L19.6603 18.7321C19.538 18.9437 19.2807 19.036 19.0518 18.9503L16.5055 17.9964C16.0254 18.3577 15.5003 18.6628 14.9399 18.9017L14.4932 21.5822C14.453 21.8233 14.2444 22 14 22H10C9.75558 22 9.54698 21.8233 9.5068 21.5822L9.06005 18.9017C8.49972 18.6628 7.97459 18.3576 7.49442 17.9963L4.94814 18.9502C4.71926 19.036 4.46193 18.9437 4.33972 18.732L2.33972 15.2679C2.21751 15.0563 2.26625 14.7872 2.45495 14.6319L4.55396 12.9039C4.51832 12.6074 4.5 12.3057 4.5 12C4.5 11.6942 4.51832 11.3925 4.55397 11.096L2.45497 9.36805C2.26627 9.2127 2.21753 8.9437 2.33974 8.73203L4.33974 5.26792C4.46195 5.05625 4.71928 4.96396 4.94817 5.0497L7.49448 6.00364C7.97463 5.64233 8.49974 5.33724 9.06005 5.09828L9.5068 2.4178ZM10.4236 3L10.0004 5.53908C9.97118 5.71427 9.85124 5.86083 9.68528 5.92409C9.03272 6.17285 8.43025 6.52391 7.89754 6.9579C7.75976 7.07016 7.57275 7.10083 7.40632 7.03849L4.99399 6.13474L3.41755 8.86521L5.40564 10.5019C5.5426 10.6146 5.60957 10.7915 5.5816 10.9667C5.52793 11.3029 5.5 11.648 5.5 12C5.5 12.352 5.52792 12.697 5.58159 13.0332C5.60956 13.2084 5.54259 13.3853 5.40563 13.4981L3.41753 15.1347L4.99396 17.8652L7.40627 16.9615C7.5727 16.8991 7.75971 16.9298 7.8975 17.0421C8.43021 17.4761 9.0327 17.8271 9.68528 18.0759C9.85124 18.1392 9.97118 18.2857 10.0004 18.4609L10.4236 21H13.5764L13.9996 18.4609C14.0288 18.2857 14.1488 18.1392 14.3147 18.0759C14.9673 17.8272 15.5697 17.4761 16.1025 17.0421C16.2402 16.9298 16.4272 16.8992 16.5937 16.9615L19.006 17.8653L20.5824 15.1348L18.5944 13.4981C18.4574 13.3854 18.3904 13.2085 18.4184 13.0333C18.4721 12.6971 18.5 12.352 18.5 12C18.5 11.648 18.4721 11.303 18.4184 10.9668C18.3904 10.7916 18.4574 10.6147 18.5944 10.5019L20.5825 8.86526L19.006 6.13479L16.5937 7.03852C16.4273 7.10087 16.2403 7.07019 16.1025 6.95794C15.5698 6.52393 14.9673 6.17286 14.3147 5.92409C14.1488 5.86083 14.0288 5.71427 13.9996 5.53908L13.5764 3H10.4236Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12 9.5C10.6193 9.5 9.5 10.6193 9.5 12C9.5 13.3807 10.6193 14.5 12 14.5C13.3807 14.5 14.5 13.3807 14.5 12C14.5 10.6193 13.3807 9.5 12 9.5ZM8.5 12C8.5 10.067 10.067 8.5 12 8.5C13.933 8.5 15.5 10.067 15.5 12C15.5 13.933 13.933 15.5 12 15.5C10.067 15.5 8.5 13.933 8.5 12Z" fill="white"/>
+</svg>
+
           </button>
         </div>
       )}
@@ -1063,10 +1069,13 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
                   <path d="M5 16H8V19H10V14H5V16ZM8 8H5V10H10V5H8V8ZM14 19H16V16H19V14H14V19ZM16 8V5H14V10H19V8H16Z" fill="white"/>
                 </svg>
               ) : (
-                // Enter fullscreen icon
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 14H5V19H10V17H7V14ZM5 10H7V7H10V5H5V10ZM17 17H14V19H19V14H17V17ZM14 5V7H17V10H19V5H14Z" fill="white"/>
-                </svg>
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M2 2H7V2.66667H2.66667V7H2V2Z" fill="white" stroke="white" stroke-width="0.25"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M14 2H9V2.66667H13.3333V7H14V2Z" fill="white" stroke="white" stroke-width="0.25"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M2 14L7 14L7 13.3333L2.66667 13.3333L2.66667 9L2 9L2 14Z" fill="white" stroke="white" stroke-width="0.25"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M14 14L9 14L9 13.3333L13.3333 13.3333L13.3333 9L14 9L14 14Z" fill="white" stroke="white" stroke-width="0.25"/>
+</svg>
+
               )}
             </button>
           </div>
@@ -1195,7 +1204,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
                 Авто
                 {quality === 'auto' && (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
+                    <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#EE6A2F"/>
                   </svg>
                 )}
               </button>
@@ -1217,7 +1226,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
                     {qLabel}
                     {quality === qId && (
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
+                        <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#EE6A2F"/>
                       </svg>
                     )}
                   </button>
@@ -1257,7 +1266,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
                   {rate === 1 ? 'Обычная' : `${rate}x`}
                   {playbackRate === rate && (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
+                      <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#EE6A2F"/>
                     </svg>
                   )}
                 </button>
@@ -1297,7 +1306,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
                     {track.label || `Дорожка ${index + 1}`}
                     {currentAudioTrack === index && (
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
+                        <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#EE6A2F"/>
                       </svg>
                     )}
                   </button>
@@ -1339,7 +1348,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
                 Выключено
                 {currentSubtitleTrack === -1 && (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
+                    <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#EE6A2F"/>
                   </svg>
                 )}
               </button>
@@ -1358,7 +1367,7 @@ const VideoPlayer = ({ videoUrl, onOpenAudioMenu, onOpenSubtitleMenu }) => {
                   {track.label || `Субтитры ${index + 1}`}
                   {currentSubtitleTrack === index && (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#FF6B35"/>
+                      <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#EE6A2F"/>
                     </svg>
                   )}
                 </button>

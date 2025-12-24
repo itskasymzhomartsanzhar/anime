@@ -28,8 +28,10 @@
     justify-content: space-between;
     align-items: flex-start;
     padding: 0 16px;
-    margin-bottom: 16px;
+
+
   }
+
 
   &__title-section {
     flex: 1;
@@ -178,28 +180,16 @@
       white-space: nowrap;
     }
 
-    &--audio {
-      &:hover {
-        background: #fff;
-        border-color:#fff;
-        color: #000;
-        svg {
-          fill: #fff;
-          path{
-            stroke: #000;
-          }
-        }
-      }
-    }
+    &--active {
+      background: #fff;
+      color: #000;
 
-    &--subtitle {
-      &:hover {
-        background: #fff;
-        border-color:#fff;
-        color: #000;
-        svg {
-          color: #000;
-        }
+      svg {
+        fill:#fff;
+      }
+
+      &:active {
+        transform: scale(0.98);
       }
     }
   }
@@ -239,21 +229,21 @@
     border-right: 1px solid rgba(255, 255, 255, 0.4);
     padding-right: 10px;
     &--active {
-      color: #ff6b35;
+      color: #EE6A2F;
 
       svg {
-        color: #ff6b35;
+        color: #EE6A2F;
       }
     }
   }
 
   &__rating-btn-dislike {
     &--active {
-      color: #ff6b35;
+      color: #EE6A2F;
 
 
       svg {
-        color: #ff6b35;
+        color: #EE6A2F;
 
       }
     }
@@ -327,7 +317,7 @@
 
   &__comments {
     padding: 16px 16px;
-    background-color: #1A1A1A;
+    background-color: rgba(26, 26, 26);
     margin: 0 16px 16px 16px;
     border-radius: 12px;
 
@@ -348,13 +338,16 @@
     background: none;
     border: none;
     color: white;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 400;
     cursor: pointer;
     padding: 0;
     margin-bottom: 16px;
   }
-
+  &__comments-mainheader{
+    font-weight: 400;
+    font-style: normal;
+  }
   &__comments-icon--open {
     transform: rotate(180deg);
     transition: transform 0.2s;
@@ -750,7 +743,7 @@
     }
 
     &:focus {
-      border-color: #FF6B35;
+      border-color: #EE6A2F;
     }
   }
 
@@ -779,7 +772,7 @@
   &__replies-toggle {
     background: none;
     border: none;
-    color: #FF6B35;
+    color: #ffffff;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -813,7 +806,7 @@
   &__load-more {
     background: none;
     border: none;
-    color: #FF6B35;
+    color: #EE6A2F;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
@@ -870,7 +863,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 16px 20px;
+    padding: 6px 20px 16px 20px;
     background: #1a1a1a;
   }
 
@@ -884,7 +877,7 @@
 
   &__input {
     flex: 1;
-    background: #2a2a2a;
+    background: #272727;
     border: none;
     color: white;
     padding: 12px 16px;

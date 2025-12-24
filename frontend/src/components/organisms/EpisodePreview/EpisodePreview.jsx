@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './EpisodePreview.scss';
 import placeholder from '@/assets/placeholder.jpg';
 
-const EpisodePreview = ({ episodes = [] }) => {
+const EpisodePreview = ({ episodes = [], isHomePage = false }) => {
   const navigate = useNavigate();
   const [selectedEpisode, setSelectedEpisode] = useState(null);
   const [showEpisodeMenu, setShowEpisodeMenu] = useState(false);
@@ -66,22 +66,23 @@ const EpisodePreview = ({ episodes = [] }) => {
 
   return (
     <>
-      {/* Tabs */}
-      <div className="episode-preview__tabs">
-      <button
-          className={`episode-preview__tab ${activeTab === 'all' ? 'episode-preview__tab--active' : ''}`}
-          onClick={() => setActiveTab('all')}
-        >
-          Все эпизоды
-        </button>
-        <button
-          className={`episode-preview__tab ${activeTab === 'similar' ? 'episode-preview__tab--active' : ''}`}
-          onClick={() => setActiveTab('similar')}
-        >
-          Похожие
-        </button>
-
-      </div>
+      {/* Tabs - скрываем на главной странице */}
+      {!isHomePage && (
+        <div className="episode-preview__tabs">
+          <button
+            className={`episode-preview__tab ${activeTab === 'all' ? 'episode-preview__tab--active' : ''}`}
+            onClick={() => setActiveTab('all')}
+          >
+            Все эпизоды
+          </button>
+          <button
+            className={`episode-preview__tab ${activeTab === 'similar' ? 'episode-preview__tab--active' : ''}`}
+            onClick={() => setActiveTab('similar')}
+          >
+            Похожие
+          </button>
+        </div>
+      )}
 
       <div className="episode-preview">
         {episodes.map((episode) => (
@@ -92,16 +93,18 @@ const EpisodePreview = ({ episodes = [] }) => {
           >
             <div className="episode-preview__video">
               <img src={episode.thumbnail || placeholder} alt="Episode Preview" />
+              <span className="episode-preview__duration">
+                {episode.duration || '11:11'}
+              </span>
             </div>
             <div className="episode-preview__details">
               <div className='episode-preview__info'>
-                {activeTab === 'similar' && (
+
                   <img
                     src={episode.animeImage || placeholder}
                     alt="Episode Preview"
                     className='episode-preview__image'
                   />
-                )}
                 <div>
                   <h2 className="episode-preview__title">{episode.title}</h2>
                   <h5 className="episode-preview__description">

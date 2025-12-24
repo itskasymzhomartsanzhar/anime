@@ -18,9 +18,8 @@
 
     &__tab {
         background: #1a1a1a;
-        border: 1px solid rgba(255, 255, 255, 0.2);
         color: white;
-        padding: 8px 16px;
+        padding: 8px;
         border-radius: 8px;
         font-size: 14px;
         font-weight: 500;
@@ -32,19 +31,32 @@
         color: #000000;
         }
 
-        &:active {
-        transform: scale(0.95);
-        }
+
     }
 
     &__video{
         width: 100%;
         margin-bottom: 12px;
         box-sizing: border-box;
+        position: relative;
 
         img {
             width: 100%;
+            display: block;
         }
+    }
+
+    &__duration {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: #171717CC;
+        opacity: 0.8;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
     }
 
     &__details{

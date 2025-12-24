@@ -15,7 +15,8 @@ const Home = () => {
       animeName: 'Attack on Titan',
       thumbnail: placeholder,
       animeImage: placeholder,
-      daysAgo: 1
+      daysAgo: 1,
+      duration: '23:45'
     },
     {
       id: 2,
@@ -24,7 +25,8 @@ const Home = () => {
       animeName: 'Demon Slayer',
       thumbnail: placeholder,
       animeImage: placeholder,
-      daysAgo: 1
+      daysAgo: 1,
+      duration: '24:12'
     },
     {
       id: 3,
@@ -33,7 +35,8 @@ const Home = () => {
       animeName: 'Jujutsu Kaisen',
       thumbnail: placeholder,
       animeImage: placeholder,
-      daysAgo: 2
+      daysAgo: 2,
+      duration: '22:30'
     },
     {
       id: 4,
@@ -42,7 +45,8 @@ const Home = () => {
       animeName: 'One Piece',
       thumbnail: placeholder,
       animeImage: placeholder,
-      daysAgo: 2
+      daysAgo: 2,
+      duration: '23:58'
     },
     {
       id: 5,
@@ -51,7 +55,8 @@ const Home = () => {
       animeName: 'My Hero Academia',
       thumbnail: placeholder,
       animeImage: placeholder,
-      daysAgo: 3
+      daysAgo: 3,
+      duration: '24:05'
     },
     {
       id: 6,
@@ -60,7 +65,8 @@ const Home = () => {
       animeName: 'Tokyo Revengers',
       thumbnail: placeholder,
       animeImage: placeholder,
-      daysAgo: 3
+      daysAgo: 3,
+      duration: '23:22'
     },
     {
       id: 7,
@@ -69,7 +75,8 @@ const Home = () => {
       animeName: 'Naruto Shippuden',
       thumbnail: placeholder,
       animeImage: placeholder,
-      daysAgo: 4
+      daysAgo: 4,
+      duration: '23:15'
     },
     {
       id: 8,
@@ -78,7 +85,8 @@ const Home = () => {
       animeName: 'Bleach',
       thumbnail: placeholder,
       animeImage: placeholder,
-      daysAgo: 5
+      daysAgo: 5,
+      duration: '24:00'
     }
   ];
 
@@ -109,7 +117,7 @@ const Home = () => {
 
         <div className="home__main">
           <PosterSlider />
-          <EpisodePreview episodes={mockEpisodes} />
+          <EpisodePreview episodes={mockEpisodes} isHomePage={true} />
         </div>
       </div>
 
