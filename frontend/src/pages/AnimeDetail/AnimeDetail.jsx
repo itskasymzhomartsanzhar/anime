@@ -18,6 +18,7 @@ const AnimeDetail = () => {
   const [recapFilter, setRecapFilter] = useState('New');
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showStickyTitle, setShowStickyTitle] = useState(false);
+  const [showWatchButton, setShowWatchButton] = useState(false);
   const titleRef = useRef(null);
 
   // Mock data
@@ -120,6 +121,21 @@ const AnimeDetail = () => {
         observer.unobserve(titleRef.current);
       }
     };
+  }, []);
+
+  // Отслеживание скролла для показа кнопки просмотра
+  useEffect(() => {
+    const handleScroll = () => {
+      // Показываем кнопку когда пользователь прокрутил вниз более 300px
+      if (window.scrollY > 300) {
+        setShowWatchButton(true);
+      } else {
+        setShowWatchButton(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
@@ -244,10 +260,12 @@ const AnimeDetail = () => {
 
             {activeTab !== 'all-seasons' ? (
               <>
-                <div className="anime-detail__season-info">
-                  <h3 className="anime-detail__season-title">С1- Название сезона</h3>
-                  <p className="anime-detail__episode-count">Эпизод 21</p>
-                </div>
+                {activeTab !== 'movies' && (
+                  <div className="anime-detail__season-info">
+                    <h3 className="anime-detail__season-title">С1- Название сезона</h3>
+                    <p className="anime-detail__episode-count">Эпизод 21</p>
+                  </div>
+                )}
 
                 <div className="anime-detail__filters">
                   {filters.map((filter) => (
@@ -273,7 +291,7 @@ const AnimeDetail = () => {
 
 
       {/* Content based on active tab */}
-      {activeTab === 'all-seasons' ? (
+      {activeTab === 'all-seasons'  ? (
         // All Seasons Grid
         <div className="anime-detail__all-seasons">
           <div className="anime-detail__season-header">
@@ -335,8 +353,11 @@ const AnimeDetail = () => {
         </>
       )}
 
+
+      
+
       {/* Fixed Watch Button Container */}
-      <div className="anime-detail__fixed-buttons">
+      <div className={`anime-detail__fixed-buttons ${showWatchButton ? 'anime-detail__fixed-buttons--visible' : ''}`}>
         <button
           className="anime-detail__fixed-watch-btn"
           onClick={() => navigate(`/watch/${id}/1`)}

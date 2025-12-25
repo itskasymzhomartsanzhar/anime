@@ -57,6 +57,12 @@ const Watch = () => {
   const handleToggleSubtitles = useCallback(() => {
     setIsSubtitlesEnabled(prev => !prev);
   }, []);
+
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
 const [commentsData, setCommentsData] = useState([
   {
     id: 1,

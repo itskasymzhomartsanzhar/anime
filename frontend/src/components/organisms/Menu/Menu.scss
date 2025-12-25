@@ -95,7 +95,7 @@
     // Центральная кнопка (Catalog)
     &:nth-child(3) {
       position: relative;
-      margin-top: -32px;
+      margin-top: -27px;
 
       .menu__icon {
         background: white;
@@ -109,7 +109,7 @@
 
       // Убрали margin-top, чтобы label был на одном уровне с остальными
       .menu__label {
-        margin-top: 14px;
+        margin-top: 9px;
       }
 
       &:active .menu__icon {
