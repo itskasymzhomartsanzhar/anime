@@ -314,6 +314,8 @@
   &__filters {
     display: flex;
     gap: 8px;
+    margin-top: 10px;
+
     overflow-x: auto;
     scrollbar-width: none;
 
@@ -1021,7 +1023,7 @@
   }
 
   &__season-info {
-    padding: 12px 0;
+    padding: 12px 0 0 0 ;
 
     h4 {
       margin: 0 0 4px 0;
